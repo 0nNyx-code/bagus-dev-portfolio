@@ -1,0 +1,36 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 450" role="img" aria-label="Ilustrasi desain dulu baru kode">
+  <rect width="800" height="450" fill="#F3EFE6"/>
+  <!-- wireframe kiri -->
+  <g>
+    <rect x="60" y="90" width="280" height="250" fill="#FFFFFF" stroke="#17150F" stroke-width="6"/>
+    <rect x="60" y="90" width="280" height="52" fill="#002FA7" stroke="#17150F" stroke-width="6"/>
+    <circle cx="92" cy="116" r="9" fill="#F3EFE6"/>
+    <rect x="84" y="170" width="110" height="70" fill="#F5C400" stroke="#17150F" stroke-width="5"/>
+    <rect x="210" y="170" width="110" height="70" fill="none" stroke="#17150F" stroke-width="4" stroke-dasharray="8 6"/>
+    <rect x="84" y="262" width="236" height="18" fill="#17150F" opacity="0.85"/>
+    <rect x="84" y="292" width="180" height="18" fill="#17150F" opacity="0.35"/>
+  </g>
+  <!-- arrow -->
+  <g stroke="#FF421C" stroke-width="8" stroke-linecap="square" fill="none">
+    <path d="M372 215 H440"/>
+    <path d="M440 215 l-26 -16 M440 215 l-26 16"/>
+  </g>
+  <!-- kode kanan -->
+  <g>
+    <rect x="480" y="90" width="260" height="250" fill="#17150F"/>
+    <g fill="#F3EFE6">
+      <rect x="508" y="130" width="150" height="14"/>
+      <rect x="530" y="158" width="120" height="14" fill="#FF421C"/>
+      <rect x="552" y="186" width="100" height="14" fill="#F5C400"/>
+      <rect x="530" y="214" width="140" height="14" fill="#D4FF00"/>
+      <rect x="508" y="242" width="90" height="14"/>
+      <rect x="530" y="270" width="160" height="14" fill="#7D9BFF"/>
+      <rect x="508" y="298" width="60" height="14"/>
+    </g>
+    <text x="508" y="112" font-family="monospace" font-size="16" font-weight="bold" fill="#D4FF00">layout.css</text>
+  </g>
+  <g font-family="monospace" font-weight="bold" fill="#17150F">
+    <text x="60" y="62" font-size="26">DESAIN → KODE /// 04</text>
+    <text x="60" y="418" font-size="20" opacity="0.65">desain dulu, bukan gaya-gayaan</text>
+  </g>
+</svg>

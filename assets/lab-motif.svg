@@ -1,0 +1,39 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 600 450" role="img" aria-label="Ilustrasi profil bengkel">
+  <rect width="600" height="450" fill="#F3EFE6"/>
+  <!-- awning toko -->
+  <g>
+    <rect x="70" y="90" width="460" height="70" fill="#FF421C" stroke="#17150F" stroke-width="6"/>
+    <path d="M70 160 h460 v0" stroke="#17150F" stroke-width="6"/>
+    <g fill="#F3EFE6">
+      <path d="M70 160 a40 26 0 0 0 76 0 z"/>
+      <path d="M146 160 a40 26 0 0 0 76 0 z"/>
+      <path d="M222 160 a40 26 0 0 0 76 0 z"/>
+      <path d="M298 160 a40 26 0 0 0 76 0 z"/>
+      <path d="M374 160 a40 26 0 0 0 76 0 z"/>
+      <path d="M450 160 a40 26 0 0 0 80 0 z"/>
+    </g>
+    <rect x="110" y="100" width="300" height="34" rx="4" fill="#F3EFE6" stroke="#17150F" stroke-width="4"/>
+    <text x="130" y="126" font-family="monospace" font-size="22" font-weight="bold" fill="#17150F">BENGKEL /// 05</text>
+  </g>
+  <!-- gedung -->
+  <rect x="110" y="190" width="380" height="180" fill="#FFFFFF" stroke="#17150F" stroke-width="6"/>
+  <rect x="150" y="220" width="120" height="80" fill="#002FA7" stroke="#17150F" stroke-width="5"/>
+  <rect x="310" y="220" width="140" height="150" fill="#17150F"/>
+  <circle cx="380" cy="290" r="8" fill="#D4FF00"/>
+  <!-- gear -->
+  <g transform="translate(430 130)">
+    <circle r="34" fill="#F5C400" stroke="#17150F" stroke-width="6"/>
+    <circle r="14" fill="#F3EFE6" stroke="#17150F" stroke-width="5"/>
+    <g stroke="#17150F" stroke-width="7" stroke-linecap="square">
+      <line x1="0" y1="-42" x2="0" y2="-56"/>
+      <line x1="0" y1="42" x2="0" y2="56"/>
+      <line x1="-42" y1="0" x2="-56" y2="0"/>
+      <line x1="42" y1="0" x2="56" y2="0"/>
+    </g>
+  </g>
+  <!-- chip WA -->
+  <g>
+    <rect x="160" y="392" width="200" height="36" rx="18" fill="#D4FF00" stroke="#17150F" stroke-width="4"/>
+    <text x="260" y="416" font-family="monospace" font-size="18" font-weight="bold" fill="#17150F" text-anchor="middle">HUBUNGI KAMI</text>
+  </g>
+</svg>

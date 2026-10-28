@@ -1,0 +1,23 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 450" role="img" aria-label="Ilustrasi palet warna berani">
+  <defs>
+    <pattern id="dots1" width="18" height="18" patternUnits="userSpaceOnUse">
+      <circle cx="2.5" cy="2.5" r="2.2" fill="#17150F" opacity="0.28"/>
+    </pattern>
+  </defs>
+  <rect width="800" height="450" fill="#F3EFE6"/>
+  <rect x="0" y="0" width="800" height="96" fill="url(#dots1)"/>
+  <g transform="rotate(-3 400 225)">
+    <rect x="60" y="130" width="180" height="230" fill="#FF421C" stroke="#17150F" stroke-width="7"/>
+    <rect x="255" y="150" width="150" height="190" fill="#F5C400" stroke="#17150F" stroke-width="7"/>
+    <rect x="420" y="110" width="120" height="250" fill="#002FA7" stroke="#17150F" stroke-width="7"/>
+    <rect x="555" y="160" width="95" height="200" fill="#D4FF00" stroke="#17150F" stroke-width="7"/>
+    <circle cx="700" cy="180" r="55" fill="#FF2D87" stroke="#17150F" stroke-width="7"/>
+    <circle cx="700" cy="300" r="34" fill="#17150F"/>
+    <path d="M700 118c2.4 11.5 7 15.5 17.8 17.7-10.8 2.3-15.4 6.3-17.8 17.8-2.4-11.5-7-15.5-17.8-17.8 10.8-2.2 15.4-6.2 17.8-17.7z" fill="#F3EFE6" stroke="#17150F" stroke-width="4"/>
+  </g>
+  <g font-family="monospace" font-weight="bold" fill="#17150F">
+    <text x="64" y="62" font-size="26">PALET /// 01</text>
+    <text x="64" y="408" font-size="20" opacity="0.65">#FF421C · #F5C400 · #002FA7</text>
+  </g>
+  <path d="M762 30c2.4 11.5 7 15.5 17.8 17.7-10.8 2.3-15.4 6.3-17.8 17.8-2.4-11.5-7-15.5-17.8-17.8 10.8-2.2 15.4-6.2 17.8-17.7z" fill="#FF421C"/>
+</svg>

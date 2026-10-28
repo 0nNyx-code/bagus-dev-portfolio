@@ -1,0 +1,21 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 450" role="img" aria-label="Ilustrasi grid yang tidak kaku">
+  <defs>
+    <pattern id="grid2" width="66" height="66" patternUnits="userSpaceOnUse">
+      <rect width="66" height="66" fill="none" stroke="#17150F" stroke-width="1.5" opacity="0.35"/>
+    </pattern>
+  </defs>
+  <rect width="800" height="450" fill="#F3EFE6"/>
+  <rect width="800" height="450" fill="url(#grid2)"/>
+  <!-- blok keluar dari grid -->
+  <rect x="330" y="60" width="240" height="300" fill="#FF421C" stroke="#17150F" stroke-width="7" transform="rotate(2 450 210)"/>
+  <rect x="600" y="110" width="150" height="150" fill="#002FA7" stroke="#17150F" stroke-width="7"/>
+  <circle cx="230" cy="330" r="90" fill="#F5C400" stroke="#17150F" stroke-width="7"/>
+  <rect x="120" y="80" width="120" height="80" fill="none" stroke="#17150F" stroke-width="4" stroke-dasharray="9 7"/>
+  <!-- garis arrow keluar grid -->
+  <path d="M700 300 L760 250" stroke="#17150F" stroke-width="6" stroke-linecap="square"/>
+  <path d="M760 250 l-30 4 M760 250 l-4 30" stroke="#17150F" stroke-width="6" stroke-linecap="square"/>
+  <g font-family="monospace" font-weight="bold" fill="#17150F">
+    <text x="64" y="62" font-size="26">GRID /// 02</text>
+    <text x="64" y="418" font-size="20" opacity="0.65">12 kol — 1 yang ngaco</text>
+  </g>
+</svg>

@@ -1,0 +1,25 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 450" role="img" aria-label="Ilustrasi type scale responsif">
+  <rect width="800" height="450" fill="#17150F"/>
+  <g fill="#F3EFE6" font-family="sans-serif" font-weight="800">
+    <text x="40" y="150" font-size="128">Aa</text>
+    <text x="230" y="212" font-size="84">Aa</text>
+    <text x="356" y="252" font-size="56" fill="#FF421C">Aa</text>
+    <text x="448" y="278" font-size="36" fill="#F5C400">Aa</text>
+    <text x="520" y="296" font-size="24" fill="#D4FF00">Aa</text>
+    <text x="576" y="308" font-size="16" fill="#F3EFE6">Aa</text>
+  </g>
+  <!-- garis baseline -->
+  <g stroke="#F3EFE6" stroke-width="1.5" opacity="0.5">
+    <line x1="40" y1="152" x2="300" y2="152"/>
+    <line x1="230" y1="214" x2="360" y2="214"/>
+    <line x1="356" y1="254" x2="430" y2="254"/>
+    <line x1="448" y1="280" x2="510" y2="280"/>
+    <line x1="520" y1="298" x2="570" y2="298"/>
+  </g>
+  <g font-family="monospace" font-weight="bold">
+    <text x="40" y="388" font-size="22" fill="#F3EFE6">clamp(2rem → 5rem)</text>
+    <text x="40" y="418" font-size="16" fill="#F3EFE6" opacity="0.55">font-size /// 03</text>
+    <circle cx="740" cy="60" r="40" fill="#FF421C"/>
+    <text x="740" y="68" font-size="20" fill="#17150F" text-anchor="middle" font-weight="bold">FPS</text>
+  </g>
+</svg>
