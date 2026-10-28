@@ -14,7 +14,7 @@
  */
 
 const NVIDIA_URL = 'https://integrate.api.nvidia.com/v1/chat/completions';
-const MODEL = 'meta/llama-3.2-11b-vision-instruct';
+const MODEL = 'nvidia/nemotron-3-ultra-550b-a55b';
 
 const SYSTEM_PROMPT = [
   'Kamu adalah "Bagus AI", asisten ramah di website portfolio bagus-dev.',
