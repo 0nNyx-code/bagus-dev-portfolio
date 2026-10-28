@@ -51,7 +51,7 @@
 <script>
   (function () {
     try {
-      var t = localStorage.getItem('bdv-theme') || (window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light');
+      var t = localStorage.getItem('bdv-theme') || 'light';
       t = t === 'dark' ? 'dark' : 'light';
       var p = localStorage.getItem('bdv-preset') || '';
       if (p !== 'neon' && p !== 'acid' && p !== 'sunset') p = '';
