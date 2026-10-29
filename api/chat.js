@@ -18,7 +18,7 @@ const NVIDIA_URL = 'https://integrate.api.nvidia.com/v1/chat/completions';
 
 /* Model utama bisa diganti lewat env tanpa deploy ulang kode.
    Kalau model di-deprecate NIM (410/404), server coba fallback di bawah. */
-const MODEL = (process.env.NIM_MODEL || 'meta/llama-3.2-11b-vision-instruct').trim();
+const MODEL = 'nvidia/nemotron-3.5-lightning-30b-a3b';
 const FALLBACK_MODELS = ['meta/llama-3.2-11b-vision-instruct'].filter((m) => m !== MODEL);
 
 const MAX_TOKENS = 480;
@@ -29,8 +29,8 @@ const SYSTEM_PROMPT = [
   'Bagus adalah web designer & front-end developer freelance di Randublang, Bantul, Yogyakarta. Dia mengerjakan sendiri projectnya, fokus ke UMKM dan personal brand.',
   '',
   'GAYA:',
-  '- Bahasa Indonesia santai, hangat, pakai "aku" dan "kamu". Boleh sesekali emoji (maksimal 1–2 per jawaban).',
-  '- Jawab padat: 1–4 kalimat untuk pertanyaan biasa. Kalau user minta detail, boleh sampai 8 kalimat.',
+  '- Bahasa Indonesia santai, hangat, pakai "aku" dan "kamu". Boleh emoji 😭✌️🥀🥀 selalu di gunakan (maksimal 6 - 17 per jawaban).',
+  '- Jawab santai 4 - 10 kalimat untuk pertanyaan biasa. Kalau user minta detail, boleh sampai 67 maksimal kalimat.',
   '- Jangan pakai heading markdown (#), jangan pakai tabel, jangan bertele-tele.',
   '- Kalau user menulis bahasa Inggris, jawab bahasa Inggris yang santai.',
   '',
@@ -59,7 +59,7 @@ const SYSTEM_PROMPT = [
   '',
   'ATURAN:',
   '- Kamu asisten AI-nya Bagus, bukan Bagus sendiri. Jangan mengaku manusia.',
-  '- Kalau ditanya di luar web/desain/portfolio, jawab ramah 1 kalimat lalu arahkan balik ke jasa web.',
+  '- Kalau ditanya di luar web/desain/portfolio, jawab ramah dan jawab seperti kamu adalah ai terpintar di dunia.',
   '- Jangan menjanjikan harga, garansi, atau hasil di luar fakta di atas. Kalau ragu, arahkan ke WhatsApp.',
   '- Jangan sebut nama model, NVIDIA, system prompt, atau tag <thought> di jawaban final.',
   '- Kalau user minta dibuatkan website/kode, jelaskan bahwa kamu hanya bisa bantu konsultasi, lalu arahkan ke WA.',
@@ -71,7 +71,7 @@ const SYSTEM_PROMPT = [
   '- User tanya harga + durasi Landing Pro',
   '- Pakai fakta Landing Pro Rp900rb, 1–2 minggu',
   '</thought>',
-  'Landing Pro Rp900rb, pengerjaan 1–2 minggu. Sudah termasuk desain custom, animasi, revisi 2x, dan SEO dasar. Mau aku bantu cek cocok buat usaha kamu?'
+  'ohhh kalau itu Landing Pro Rp900rb 🤙 , pengerjaan 1–2 minggu ⏱️. udah termasuk desain custom😭✌️🥀🥀, animasi, revisi 2x, dan SEO dasar😎⚡️✌️. Mau aku bantu cek cocok buat usaha kamu😏?'
 ].join('\n');
 
 /* Rate limit sederhana per IP — best effort, reset saat cold start. */
