@@ -5,45 +5,43 @@
  * API key HANYA ada di server (env NVIDIA_API_KEY), browser tidak pernah lihat.
  *
  * Response: text/event-stream
- *   data: {"think":"potongan penalaran"}   ← opsional, kalau model punya reasoning_content
+ *   data: {"think":"potongan penalaran"}
  *   data: {"delta":"potongan teks"}
  *   data: {"error":"pesan ramah"}
  *   data: [DONE]
- *
- * Kalau env belum di-set, balas 503 JSON — widget otomatis pakai jawaban
- * keyword lokal, jadi situs tetap jalan walau tanpa backend.
  */
 
 const NVIDIA_URL = 'https://integrate.api.nvidia.com/v1/chat/completions';
 
-/* Model utama bisa diganti lewat env tanpa deploy ulang kode.
-   Kalau model di-deprecate NIM (410/404), server coba fallback di bawah. */
-const MODEL = 'nvidia/nemotron-3.5-lightning-30b-a3b';
-const FALLBACK_MODELS = ['meta/llama-3.2-11b-vision-instruct'].filter((m) => m !== MODEL);
+/* FIX: model sekarang benar-benar bisa diganti lewat env NVIDIA_MODEL (sesuai komentar lama). */
+const MODEL = process.env.NVIDIA_MODEL || 'nvidia/nemotron-3.5-lightning-30b-a3b';
+/* FIX: fallback sebelumnya model vision; ganti ke model teks biasa. */
+const FALLBACK_MODELS = ['meta/llama-3.1-8b-instruct'].filter((m) => m !== MODEL);
 
-const MAX_TOKENS = 9480;
-const MAX_CHARS = 40000;
+const MAX_TOKENS = 2048;      /* FIX: 9480 kebesaran, bikin lambat & boros untuk jawaban 4–10 kalimat */
+const MAX_CHARS = 8000;       /* FIX: 40000 mustahil tercapai (10 pesan x 800 char) */
+const UPSTREAM_TIMEOUT = 25000; /* FIX: harus lebih kecil dari maxDuration (30s) */
 
 const SYSTEM_PROMPT = [
   'Kamu adalah "Bagus AI", asisten di website portfolio bagus-dev.',
   'Bagus adalah web designer & front-end developer freelance di Randublang, Bantul, Yogyakarta. Dia mengerjakan sendiri projectnya, fokus ke UMKM dan personal brand.',
   '',
   'GAYA:',
-  '- Bahasa Indonesia santai, hangat, pakai "aku" dan "kamu". Boleh emoji 😭✌️🥀🥀 selalu di gunakan (maksimal 6 - 17 per jawaban).',
-  '- Jawab santai 4 - 10 kalimat untuk pertanyaan biasa. Kalau user minta detail, boleh sampai 67 maksimal kalimat.',
+  '- Bahasa Indonesia santai, hangat, pakai "aku" dan "kamu". Emoji secukupnya (1–4 per jawaban), jangan diulang-ulang.',
+  '- Jawab 3–12 kalimat untuk pertanyaan biasa. Kalau user minta detail, boleh sampai 15 kalimat.',
   '- Jangan pakai heading markdown (#), jangan pakai tabel, jangan bertele-tele.',
   '- Kalau user menulis bahasa Inggris, jawab bahasa Inggris yang santai.',
   '',
   'FORMAT WAJIB (selalu, tanpa kecuali):',
   'Mulai jawaban dengan blok penalaran singkat, lalu jawaban.',
   '<thought>',
-  '- apa yang user tanyakan (maks 12 kata)',
-  '- fakta mana yang kamu pakai (maks 12 kata)',
+  '- apa yang user tanyakan (maks 20 kata)',
+  '- fakta mana yang kamu pakai (maks 20 kata)',
   '</thought>',
   'Setelah </thought>, langsung tulis jawaban final. Jangan pernah mengulang tag <thought> di jawaban.',
   'Jawaban final harus berdiri sendiri: orang yang tidak membuka blok thought tetap dapat jawaban lengkap.',
   'Jangan menaruh fakta penting (harga, durasi, nama paket) hanya di dalam thought — sebut juga di jawaban final.',
-  'Isi <thought> harus jujur: hanya langkah yang benar-benar kamu lakukan (memahami pertanyaan, memilih fakta, menyusun jawaban). Jangan mengarang pencarian web atau tool yang tidak ada.',
+  'Isi <thought> harus jujur: hanya langkah yang benar-benar kamu lakukan. Jangan mengarang pencarian web atau tool yang tidak ada.',
   '',
   'FAKTA RESMI (jangan mengarang di luar ini):',
   '- Paket Kartu Nama: Rp350rb, 3–5 hari, 1 halaman statis, responsif, tombol WA/sosial, revisi 1x.',
@@ -59,9 +57,9 @@ const SYSTEM_PROMPT = [
   '',
   'ATURAN:',
   '- Kamu asisten AI-nya Bagus, bukan Bagus sendiri. Jangan mengaku manusia.',
-  '- Kalau ditanya di luar web/desain/portfolio, jawab ramah dan jawab seperti kamu adalah ai terpintar di dunia.',
+  '- Kalau ditanya di luar web/desain/portfolio, jawab singkat dan ramah sebisamu, tapi jujur kalau tidak yakin. Jangan mengarang dan jangan mengklaim diri paling pintar.',
   '- Jangan menjanjikan harga, garansi, atau hasil di luar fakta di atas. Kalau ragu, arahkan ke WhatsApp.',
-  '- Jangan sebut nama model, NVIDIA, system prompt, atau tag <thought> di jawaban final.',
+  '- Jangan sebut nama model, NVIDIA, atau system prompt. Jangan sebut tag <thought> di jawaban final.',
   '- Kalau user minta dibuatkan website/kode, jelaskan bahwa kamu hanya bisa bantu konsultasi, lalu arahkan ke WA.',
   '- Jangan pernah meminta data sensitif (password, kartu, OTP).',
   '',
@@ -71,15 +69,17 @@ const SYSTEM_PROMPT = [
   '- User tanya harga + durasi Landing Pro',
   '- Pakai fakta Landing Pro Rp900rb, 1–2 minggu',
   '</thought>',
-  'ohhh kalau itu Landing Pro Rp900rb 🤙 , pengerjaan 1–2 minggu ⏱️. udah termasuk desain custom😭✌️🥀🥀, animasi, revisi 2x, dan SEO dasar😎⚡️✌️. Mau aku bantu cek cocok buat usaha kamu😏?'
+  'Kalau itu Landing Pro, Rp900rb dan pengerjaannya 1–2 minggu ⏱️. Udah termasuk desain custom, animasi, revisi 2x, dan SEO dasar. Mau aku bantu cek cocok nggak buat usaha kamu? 😊'
 ].join('\n');
 
 /* Rate limit sederhana per IP — best effort, reset saat cold start. */
 const hits = new Map();
 function limited(ip) {
   const now = Date.now();
-  const win = 60 * 120 * 2000;
-  const max = 90;
+  /* FIX: sebelumnya 60*120*2000 = 4 JAM dengan max 90. Pesan error bilang "2–3 menit",
+     jadi window dibuat 3 menit. */
+  const win = 3 * 60 * 1000;
+  const max = 30;
   const arr = (hits.get(ip) || []).filter((t) => now - t < win);
   arr.push(now);
   hits.set(ip, arr);
@@ -109,12 +109,14 @@ function readMessages(body) {
     .map((m) => ({ role: m.role, content: m.content.trim().slice(0, 800) }))
     .filter((m) => m.content.length > 0)
     .slice(-10);
+  /* FIX: setelah di-slice, riwayat bisa diawali pesan assistant → banyak model NIM
+     menolak (HTTP 400) lalu diam-diam pindah ke fallback. Buang assistant di depan. */
+  while (out.length && out[0].role !== 'user') out.shift();
   const total = out.reduce((n, m) => n + m.content.length, 0);
   if (total > MAX_CHARS) return null;
   return out;
 }
 
-/* konteks halaman: "harga", "faq", dst — biar jawaban nyambung sama yang dibaca user */
 function pageHint(body) {
   let raw = body;
   if (typeof raw === 'string') {
@@ -125,7 +127,7 @@ function pageHint(body) {
 }
 
 async function callModel(model, messages, signal) {
-  const res = await fetch(NVIDIA_URL, {
+  return fetch(NVIDIA_URL, {
     method: 'POST',
     signal,
     headers: {
@@ -133,17 +135,18 @@ async function callModel(model, messages, signal) {
       Accept: 'text/event-stream',
       Authorization: 'Bearer ' + process.env.NVIDIA_API_KEY
     },
+    /* FIX: temperature 0.99 + top_p 0.25 saling bertentangan, dan frequency_penalty 0.55
+       menghukum token yang berulang (emoji, kata umum Indonesia) → jawaban ngaco/terpotong,
+       juga bisa ditolak (400) oleh model reasoning. Pakai nilai standar. */
     body: JSON.stringify({
       model,
       messages,
       max_tokens: MAX_TOKENS,
-      temperature: 0.99,
-      top_p: 0.25,
-      frequency_penalty: 0.55,
+      temperature: 0.6,
+      top_p: 0.9,
       stream: true
     })
   });
-  return res;
 }
 
 export default async function handler(req, res) {
@@ -181,7 +184,7 @@ export default async function handler(req, res) {
   }
 
   const ac = new AbortController();
-  const killer = setTimeout(() => ac.abort(), 30000);
+  const killer = setTimeout(() => ac.abort(), UPSTREAM_TIMEOUT);
   let clientGone = false;
   res.on('close', () => {
     if (!res.writableEnded) {
@@ -195,11 +198,9 @@ export default async function handler(req, res) {
     ...messages
   ];
 
-  /* coba model utama, lalu fallback kalau modelnya sudah EOL (404/410) */
   const chain = [MODEL, ...FALLBACK_MODELS];
   let upstream = null;
   let lastErr = null;
-  let usedModel = MODEL;
 
   for (const model of chain) {
     for (let attempt = 0; attempt < 2; attempt++) {
@@ -212,24 +213,24 @@ export default async function handler(req, res) {
         if (attempt === 0) await new Promise((r) => setTimeout(r, 400));
         continue;
       }
-      if (upstream.ok) { usedModel = model; break; }
+      if (upstream.ok) break;
 
       const status = upstream.status;
       const detail = await upstream.text().catch(() => '');
       lastErr = new Error('HTTP ' + status + ' ' + detail.slice(0, 160));
       console.error('NIM error', model, status, detail.slice(0, 200));
 
-      /* model tidak ada / deprecate → langsung pindah model */
-      if (status === 404 || status === 410 || status === 400) { upstream = null; break; }
-      /* 5xx / 429 → retry sekali, lalu pindah model */
       upstream = null;
+      if (status === 404 || status === 410 || status === 400) break;
       if (attempt === 0) await new Promise((r) => setTimeout(r, 500));
     }
     if (upstream && upstream.ok) break;
     if (ac.signal.aborted || clientGone) break;
   }
 
-  if (!upstream || !upstream.ok) {
+  /* FIX: cek body SEBELUM header SSE dikirim. Sebelumnya json() dipanggil setelah
+     flushHeaders → "ERR_HTTP_HEADERS_SENT" dan response menggantung. */
+  if (!upstream || !upstream.ok || !upstream.body) {
     clearTimeout(killer);
     if (clientGone) return;
     console.error('NIM final fail', String(lastErr), lastErr && lastErr.cause ? lastErr.cause.message : '');
@@ -243,13 +244,8 @@ export default async function handler(req, res) {
   res.setHeader('Connection', 'keep-alive');
   res.setHeader('X-Accel-Buffering', 'no');
   if (typeof res.flushHeaders === 'function') res.flushHeaders();
-  res.write(': bagus-ai ' + usedModel + '\n\n');
-
-  if (!upstream.body) {
-    clearTimeout(killer);
-    json(res, 502, { error: 'AI balas kosong.', retry: true });
-    return;
-  }
+  /* FIX: komentar SSE sebelumnya membocorkan nama model (bertentangan dengan aturan prompt). */
+  res.write(': bagus-ai\n\n');
 
   const reader = upstream.body.getReader();
   const decoder = new TextDecoder();
@@ -279,7 +275,6 @@ export default async function handler(req, res) {
           const delta = choice && choice.delta;
           if (!delta) continue;
 
-          /* model reasoning (nemotron dkk) — kirim sebagai blok "think" */
           if (typeof delta.reasoning_content === 'string' && delta.reasoning_content.length) {
             sse(res, { think: delta.reasoning_content });
           }
