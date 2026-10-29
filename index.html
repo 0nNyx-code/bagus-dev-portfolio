@@ -374,7 +374,7 @@
 
   /* ===== SPLIT TEXT (dioptimalkan) =====
      Desktop: huruf per huruf (3D rotate).
-     Mobile / lite: kata per kata (fade-up ringan, tanpa 3D) — jauh lebih ringan. */
+     Mobile / layar sempit: kata per kata (fade-up ringan, tanpa 3D). */
   [data-split] { display: inline-block; }
   [data-split] .word { display: inline-block; white-space: nowrap; }
   [data-split] .ltr { display: inline-block; opacity: 0; transform: translateY(.6em) rotateX(-90deg); transform-origin: center bottom; animation: ltrReveal .9s var(--ease-out) forwards; }
@@ -519,8 +519,6 @@
     0%, 100% { transform: scale(1); filter: brightness(1); }
     45% { transform: scale(.92); filter: brightness(1.5) drop-shadow(0 1px 5px rgba(255, 66, 28, .5)); }
   }
-  html.lite .hero-title-wrap.settled .sw { animation: none; }
-  html.lite .hero-title-wrap.settled .sw .char { animation: none !important; }
   @media (forced-colors: active) {
     .hero h1 .sw { color: CanvasText; }
   }
@@ -1544,8 +1542,6 @@
     .am-live i, .am-caret, .am-frame::before, .ascii-mark.is-live .am-art { animation: none !important; }
     .am-art { clip-path: none !important; transform: none !important; }
   }
-  html.lite .am-live i, html.lite .am-caret, html.lite .am-frame::before,
-  html.lite .ascii-mark.is-live .am-art { animation: none !important; }
 
   /* ================= LIQUID GLASS (iOS 26 style) for chat ================= */
   .chat-panel {
@@ -1746,13 +1742,6 @@
   }
   html[data-theme="dark"] .w-ph, html[data-theme="dark"] .pcard img { background-color: var(--card-2); }
 
-  /* --- device kelas rendah (html.lite) --- */
-  html.lite .aurora { animation: none; filter: blur(40px); }
-  html.lite .scanlines, html.lite .noise { display: none; }
-  html.lite .tick-track, html.lite .strip-track { animation-duration: 70s; }
-  html.lite .hero-sparkles { display: none; }
-  html.lite .tick-sep, html.lite .spec-head svg, html.lite .pcard figcaption svg { animation: none; }
-
   /* ============================================================
      v14 UPGRADE LAYER — semua tambahan, tidak ada yang dihapus
      ============================================================ */
@@ -1822,8 +1811,6 @@
 
   /* micro: ticker berhenti saat ditahan, ikon chat melambai */
   .ticker:active .tick-track { animation-play-state: paused; }
-  html.lite .hero-doodles, html.lite .hero h1 .hl::before, html.lite .hero-proof li { animation: none; }
-  html.lite .hero-doodles { display: none; }
   @media (prefers-reduced-motion: reduce) {
     .hero-doodles, .hero h1 .hl::before { display: none; }
     .hero-proof li { animation: none !important; }
@@ -2688,7 +2675,6 @@
     </button>
     <button class="dock-btn" id="dockTheme" type="button" aria-label="Preset tema"><span class="dock-tip">Preset tema</span><svg viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M10 2a8 8 0 1 0 8 8c0-1.1-.9-2-2-2h-1.5a2 2 0 0 1 0-4H15"/><circle cx="6.5" cy="10" r="1"/><circle cx="8" cy="6.5" r="1"/><circle cx="12" cy="6.5" r="1"/></svg></button>
     <button class="dock-btn" id="dockSound" type="button" aria-label="Toggle suara"><span class="dock-tip">Suara</span><svg viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M4 8v4h3l4 3V5L7 8H4z"/><path d="M14 6a4 4 0 0 1 0 8"/></svg></button>
-    <button class="dock-btn" id="dockFx" type="button" aria-label="Efek animasi" aria-pressed="true"><span class="dock-tip">Efek: penuh</span><svg viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linejoin="round"><path d="M8.4 2.2l1.5 4.1 4.1 1.5-4.1 1.5-1.5 4.1-1.5-4.1L2.8 7.8l4.1-1.5z"/><path d="M15.4 12.2l.8 2.1 2.1.8-2.1.8-.8 2.1-.8-2.1-2.1-.8 2.1-.8z"/></svg></button>
     <button class="dock-btn" id="dockShare" type="button" aria-label="Bagikan"><span class="dock-tip">Bagikan</span><svg viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.8"><circle cx="4" cy="10" r="2"/><circle cx="16" cy="4" r="2"/><circle cx="16" cy="16" r="2"/><path d="M6 10l8-5M6 10l8 5"/></svg></button>
     <button class="dock-btn" id="dockParty" type="button" aria-label="Party mode"><span class="dock-tip">Party!</span><svg viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M3 17l4-10 10 4-14 6z"/><path d="M9 8l1-2M12 10l2-1"/></svg></button>
     <button class="dock-btn" id="dockHelp" type="button" aria-label="Bantuan keyboard"><span class="dock-tip">Shortcut (?)</span><svg viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.8"><circle cx="10" cy="10" r="7"/><path d="M8 8c0-1.1.9-2 2-2s2 .9 2 2c0 1.5-2 1.5-2 3"/><circle cx="10" cy="14.5" r=".8" fill="currentColor"/></svg></button>
@@ -2788,27 +2774,9 @@
   var REDUCE = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
   var FINE = window.matchMedia('(hover: hover) and (pointer: fine)').matches;
   var htmlEl = document.documentElement;
-  /* LITE = mode hemat. Dulu: deviceMemory<=4 / core<=4 → HP kelas menengah
-     otomatis ke-lite, jadi hampir semua animasi mati. Sekarang cuma kalau
-     jaringan benar-benar hemat/lemot, atau user sendiri yang minta. */
-  function readFxPref() {
-    try {
-      var v = localStorage.getItem('bdv-fx');
-      return (v === 'full' || v === 'lite') ? v : '';
-    } catch (e) { return ''; }
-  }
-  var FX_PREF = readFxPref();
-  var LITE = (function () {
-    if (FX_PREF === 'lite') return true;
-    if (FX_PREF === 'full') return false;
-    try {
-      var conn = navigator.connection || {};
-      if (conn.saveData) return true;
-      if (/^(slow-)?2g$/.test(conn.effectiveType || '')) return true;
-    } catch (e) {}
-    return false;
-  })();
-  if (LITE) htmlEl.classList.add('lite');
+  /* v16: mode hemat dihapus. Semua efek selalu penuh — nggak ada elemen
+     dekoratif yang disembunyikan atau animasi yang dimatikan otomatis.
+     Satu-satunya pengecualian tetap preferensi OS: prefers-reduced-motion. */
   var fmt = function (n) { return Math.round(n).toString().replace(/\B(?=(\d{3})+(?!\d))/g, '.'); };
   var idr = function (n, d) { return n.toFixed(d == null ? 2 : d).replace('.', ','); };
 
@@ -3015,57 +2983,7 @@
     dockSound.addEventListener('click', function () { setSound(!soundOn); });
   }
 
-  /* ---- toggle efek penuh / hemat (ini yang balikin animasi kalau ke-disable) ---- */
-  var dockFx = $('#dockFx');
-  function paintFxBtn() {
-    if (!dockFx) return;
-    var full = !htmlEl.classList.contains('lite');
-    dockFx.classList.toggle('active', !full);
-    dockFx.setAttribute('aria-pressed', String(full));
-    var tip = dockFx.querySelector('.dock-tip');
-    if (tip) tip.textContent = full ? 'Efek: penuh' : 'Efek: hemat';
-  }
-  function setFx(full, silent) {
-    htmlEl.classList.toggle('lite', !full);
-    try { localStorage.setItem('bdv-fx', full ? 'full' : 'lite'); } catch (e) {}
-    paintFxBtn();
-    if (!silent) toast(full ? 'Efek penuh aktif ✦' : 'Mode hemat — animasi diringankan');
-    if (full) beep(880, .09, 'sine', .03);
-  }
-  if (dockFx) {
-    paintFxBtn();
-    dockFx.addEventListener('click', function () { setFx(htmlEl.classList.contains('lite')); });
-  }
-
-  /* ---- adaptive: kalau perangkat BENERAN di bawah 20fps, baru turun ke mode hemat ---- */
-  (function autoLite() {
-    if (LITE || REDUCE || FX_PREF === 'full') return;
-    var WIN = 2000, frames = 0, t0 = 0, slow = 0, tried = 0;
-    function sample(now) {
-      /* tab disembunyikan → rAF berhenti, jadi hitungan fps bakal palsu rendah.
-         reset jendela sampel biar nggak salah tuduh perangkat lemot. */
-      if (document.hidden) { frames = 0; t0 = 0; requestAnimationFrame(sample); return; }
-      if (!t0) t0 = now;
-      frames++;
-      if (now - t0 < WIN) { requestAnimationFrame(sample); return; }
-      var fps = frames / ((now - t0) / 1000);
-      frames = 0; t0 = 0; tried++;
-      if (fps < 20) slow++; else slow = 0;
-      /* butuh 2 jendela lemot beruntun → nggak salah turun gara-gara loading awal */
-      if (slow >= 2) {
-        htmlEl.classList.add('lite');
-        try { localStorage.setItem('bdv-fx', 'lite'); } catch (e) {}
-        paintFxBtn();
-        console.info('[bdv] ' + fps.toFixed(0) + 'fps — mode hemat otomatis. Dock → Efek buat maksa penuh.');
-        return;
-      }
-      if (tried >= 3) return;
-      requestAnimationFrame(sample);
-    }
-    document.addEventListener('bdv:ready', function () {
-      setTimeout(function () { requestAnimationFrame(sample); }, 900);
-    }, { once: true });
-  })();
+  /* ---- v16: toggle efek dihapus — efek selalu penuh ---- */
 
   /* ================= LOADER ================= */
   var readyFired = false;
@@ -3102,7 +3020,7 @@
       setTimeout(fireReady, 420);
       setTimeout(function () { if (loader.parentNode) loader.remove(); }, 1300);
     }
-    if (REDUCE || seen || LITE) {
+    if (REDUCE || seen) {
       loader.remove();
       htmlEl.classList.add('ready');
       requestAnimationFrame(fireReady);
@@ -3193,7 +3111,6 @@
   (function initEstMagnet() {
     var sw = document.querySelector('.hero h1 .sw');
     if (!sw || REDUCE) return;
-    if (htmlEl.classList.contains('lite')) return;
     if (!window.matchMedia || !matchMedia('(hover: hover) and (pointer: fine)').matches) return;
     var chars = Array.prototype.slice.call(sw.querySelectorAll('.char'));
     if (chars.length < 2) return;
@@ -3717,7 +3634,7 @@
   }
 
   /* ================= REVEAL + TEXT SPLIT (OPTIMIZED) ================= */
-  var SPLIT_MODE = REDUCE ? 'none' : ((FINE && !LITE && window.innerWidth >= 820) ? 'letters' : 'words');
+  var SPLIT_MODE = REDUCE ? 'none' : ((FINE && window.innerWidth >= 820) ? 'letters' : 'words');
 
   function splitText(el, baseDelay) {
     if (!el || el.dataset.splitDone === '1') return;
@@ -4291,7 +4208,7 @@
     if (!canvas) return;
     var ctx = canvas.getContext('2d');
     if (!ctx) return;
-    var DPR = Math.min(window.devicePixelRatio || 1, LITE ? 1.25 : 2);
+    var DPR = Math.min(window.devicePixelRatio || 1, 2);
     var W = 0, H = 0;
 
     function resize() {
@@ -4308,7 +4225,7 @@
     var trail = [];
     var parts = [];
     var COLORS = ['#FF421C', '#F5C400', '#002FA7', '#FF2D87', '#D4FF00'];
-    var MAX_TRAIL = LITE ? 20 : 40;
+    var MAX_TRAIL = 40;
     var TRAIL_LIFE = 520;
     var running = false, rafId = 0, lastPt = null;
 
@@ -4324,8 +4241,8 @@
     }
     function burst(x, y, n) {
       /* v14: stempel berlian + crosshair (bukan confetti bulat) */
-      parts.push({ rip: 1, x: x, y: y, life: 0, max: LITE ? 24 : 34, color: '#FF421C' });
-      parts.push({ rip: 2, x: x, y: y, life: -5, max: LITE ? 22 : 30, color: '#F5C400' });
+      parts.push({ rip: 1, x: x, y: y, life: 0, max: 34, color: '#FF421C' });
+      parts.push({ rip: 2, x: x, y: y, life: -5, max: 30, color: '#F5C400' });
       if (parts.length > 40) parts.splice(0, parts.length - 40);
       start();
     }
@@ -4338,7 +4255,7 @@
     document.addEventListener('pointerdown', function (e) {
       down = true;
       if (!(e.target && e.target.closest && e.target.closest('#pgStage'))) {
-        burst(e.clientX, e.clientY, LITE ? 6 : 12);
+        burst(e.clientX, e.clientY, 12);
       }
       start();
     }, { passive: true });
@@ -4484,7 +4401,7 @@
       var x = clientX - r.left, y = clientY - r.top;
       if (x < 0 || y < 0 || x > r.width || y > r.height) return;
       spawn('pg-ring', x, y, null, 560);
-      var n = LITE ? 4 : 7;
+      var n = 7;
       for (var i = 0; i < n; i++) {
         (function (i) {
           var ang = (Math.PI * 2 / n) * i + (Math.random() - .5) * .6;
@@ -4583,7 +4500,7 @@ try {
   const canvas = document.getElementById('gl');
   if (REDUCE || !canvas) throw new Error('skip-3d');
 
-  const LOW3D = document.documentElement.classList.contains('lite') || window.matchMedia('(pointer: coarse)').matches;
+  const LOW3D = window.matchMedia('(pointer: coarse)').matches;
   const THREE = await import('three');
   const renderer = new THREE.WebGLRenderer({ canvas, alpha: true, antialias: !LOW3D, powerPreference: LOW3D ? 'default' : 'high-performance' });
   renderer.setPixelRatio(Math.min(window.devicePixelRatio || 1, LOW3D ? 1.25 : 1.75));
@@ -4755,7 +4672,7 @@ try {
   const REDUCE = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
   const canvas = document.getElementById('loaderCanvas');
   const loaderEl = document.getElementById('loader');
-  if (REDUCE || document.documentElement.classList.contains('lite') || !canvas || !loaderEl) throw new Error('skip');
+  if (REDUCE || !canvas || !loaderEl) throw new Error('skip');
 
   const THREE = await import('three');
   const renderer = new THREE.WebGLRenderer({ canvas, alpha: true, antialias: true });
@@ -4919,7 +4836,7 @@ try {
   var MAX_CTX_CHARS = 3200;
   var WA = 'https://wa.me/62882003160605?text=Halo%20Bagus%2C%20aku%20dari%20website!';
   var onlineLabel = 'Online · biasanya balas cepat';
-  var localLabel = 'Mode ringkas · jawaban dari data halaman';
+  var localLabel = 'Jawaban lokal · dari data halaman';
 
   /* endpoint: pakai window.BDV_CHAT_API kalau di-set, kalau tidak /api/chat
      (same-origin). Di file:// atau GitHub Pages tanpa function, otomatis lokal. */
@@ -5027,6 +4944,17 @@ try {
     return 'default';
   }
 
+  /* potong tag protokol yang belum selesai dikirim, mis. "<tho" di ujung stream.
+     Tanpa ini, bubble sempat menampilkan potongan tag mentah ~200ms. */
+  function trailingTagCut(str) {
+    var lt = str.lastIndexOf('<');
+    if (lt === -1) return -1;
+    var tail = str.slice(lt + 1).toLowerCase();
+    if (tail.length > 10 || tail.indexOf('<') !== -1) return -1;
+    if ('thought>'.indexOf(tail) === 0 || '/thought>'.indexOf(tail) === 0) return lt;
+    return -1;
+  }
+
   function parseStream(raw) {
     var s = String(raw || '');
     var open = s.indexOf('<thought>');
@@ -5042,6 +4970,8 @@ try {
         answer = '';
       }
     }
+    var cut = trailingTagCut(answer);
+    if (cut > -1) answer = answer.slice(0, cut);
     return { thought: thought.trim(), answer: answer.trim(), thinking: open !== -1 && close === -1 };
   }
 
@@ -5875,8 +5805,7 @@ try {
   if (!el || !band) return;
 
   var frames = ["         .                               .                                                  .                            . \n                                                                          .    .                                  .        \n     .  .             .         .                                 .                               .                  .     \n            .                       .                         . .                              .               .           \n                .                           .                              .               .                              .\n                                      .                 .           .                          .          .            .   \n                         .                                         .                                          ..       .   \n    .      .                                         .                                  .          .                .      \n                                .  .              ..--.             ..+.                      .                  .         \n                                               .  .-#-      .-.     .-#+.           .                        .             \n                                       .         .+##-.     +#+    ..###+-.                            .                   \n             .          .              .      ..-#####-..   -#-  ..-##--+#+-...+-....                             .  .  .  \n               .--.         . .       ..+#+. .-#+..#####.. .##+  .+#++##..##+-#+--+##+-.                 .                 \n              -+-.   .    .     .   .-##..   -#+..+-+#+##+. +#+ .#+#+..++.-#-..    ..+###+.        .            ..+-.      \n            .-##-.    .          . .+##.     -#+.-++-.  .+#+-#+--...--.-#.-+-       ..+##+.                       .+-.     \n   .     . .-###-   .             .-##+  .-+-.++.--..--.+--#####+####- .+.-+.   .-+-. -###.-. .                    +#.     \n           .####-.                .-##+ .+#-  .-..-. .####+++#++#---+- ...-.      .##.+###-#.        .  ..        .##+.    \n          .+#####-.  ....          .###..#+.   ..    .+.  -######.   . ..   ...    +#####--##+-....   ..+#+..  .-+####..   \n       ...+##+.+########--..     ..--###-##.         .-.   +#+-##  .-+-.++..-+..   -####-.-########-..-################..  \n        .-###..+#+-#---+####+++++##-.-#####+..  .-....+#-..-##+#+..+##- -##+#+++...+##+. -###.+-++######-.-++#####-.+##-.  \n         .##+..+#..+#.  +##+-+#+.##..-+######-..+#-.+..+##############.  -########-##+.  +###+    ..####+--..+-.+#+.-##.   \n         .+#- .+#-...-. -##+.   .## .+####+-######.-#.+###+#######+.+#-  .-###--. .+#+. .+####-.     .+##-. .-.-##-.-##.   \n         .+#- .+#-   .+####.   -###  .-###-..-+##+-++..+##...-+-.. .+#-   .+#+..   +#+..-.#.-###-    .-#-. .  .+##. -##..  \n         .##-  -#-  ...-+##.   .-##.--.##-   ..-####+. -##...-#... .-#+-.-+##+.    -##+-+... .-###-  .--.     .+#-. +##.   \n         .+#+. .-+. .-+++#+.    +#####-##.     -###+--.-##-..-#-   .-##-.-++#+.    -##-.##.    .####++..--   .-+...-##-.   \n         .-##.  .-++...-+#+. ..+#####--#+.  .-+###--.+-+###-.-#-.  .-#-.-#+-#+.    .##. +##+.   .+######+.  .... .+###.    \n.   .     .##-    ...   .#+.+####.##+.-#+..-+#++#++-.-####-..-#-.  .+-.-##--##-    .+#-.-#####.  ..-###-.       .-##+.     \n     .    .-#+.         -#####-...##+.-##+##+.-+##+.-.-###. .-#-.  ..-##+..+##-    -##+--##.-##.  ..+##.   . ..-+#-.       \n            .##-.     .+####..   .##--##+.... .+#+. -+.+#+. .+#-. .-####-..+##+.   .+##-+##-...#.  .-##.    ..-.     .     \n    .        .+#+.   .-+##-.     .##-#+#-.    .+#+. .####+. .-#. .##-##- .+###+.  . .##-.###.   .. ..##-  .             .  \n      .      ...+#+--.  +#-.    -###..##+.   .-+#++-.-###-. ..#..-+..##--..-##+.    .##..+#+. .     .##-   ..              \n                .....  .+##.    +###..###-  .--+##+. .-##-....#..-- .##--#++##+.    .+#.-##+.     ...##- .-+-           .  \n      .                .+#-.    .##+ .##+.  -+-+#+. .--###+...#.... .##-..+###+...   +##-###.     ..####+##-.              \n    .                  .#+.      +#-..##-.  .++##-.-#--##+....# .. .-##-  .+#####+.. +##-+##+      .+#####-.               \n                .-..   +#+.      ##-#-##... .-######--#####+..# ...-+##-  .+#---+##++####-+##+.     .-##-.                 \n      .          .++-.-##+..    .###++###-   .-####--###++##-.+ ..-####-  .+-.   .-##-.+##.-###+-. .-+#+                   \n     .           ..+######-.  .-###-.###+.. . -###+.       -##.-##+-+-#+  ...    . -.   +##-.####-..##+.                   \n                    .-###+.  .###-.-###+. .   -#-.--.   .  -+-##++  .+#+              .  -##+..######-         .           \n                      .##-. -##-..###-.       -+.          -#+++#+  .-#-                  ..-##-.#####-                    \n      .        .      -##--##+. -##-.         ..         ..+##+##+-- .+.         .          . ...++#####-.       ..        \n      .              -#####+...+##-    .           .     -+########+. .                   .  . ... .-######+---+#+. .      \n                   .-#####-..+#+-.                    .   +########.                                 ..-+#######+.         \n                 ..+####+.. ...                         . .#######.                                      ..-+#+-.          \n             ...+######-.                .           ..    -#####-                         .                               \n      ..----+#######+-.     .     .                         .###- .                              .                         \n       .-######++-..              .                          .#-                          .                 .              \n                         .                                    .                                                           .\n.                                   .                                 .        .                    .                      \n                      .      .        .                              .                                     .               \n                           .       .   .                                  .                         .                      ", "                                                                                            .                              \n                                                                          .                                                \n     .                .                                                                           .                  .     \n                                                              . .                              .               .           \n                .                                                          .                                               \n                                                                    .                          .                       .   \n                         .                                         .                                          ..       .   \n    .                                                .                                  .                                  \n                                   .              ..--.             ..+.                      .                            \n                                               .  .-#-      .-.     .-#+.           .                                      \n                                       .         .+##-.     +#+    ..###+-.                            .                   \n             .                         .      ..-#####-..   -#-  ..-##--+#+-...+-....                             .  .  .  \n               .--.         .         ..+#+. .-#+..#####.. .##+  .+#++##..##+-#+--+##+-.                 .                 \n              -+-.   .          .   .-##..   -#+..+-+#+##+. +#+ .#+#+..++.-#-..    ..+###+.        .            ..+-.      \n            .-##-.    .          . .+##.     -#+.-++-.  .+#+-#+--...--.-#.-+-       ..+##+.                       .+-.     \n   .       .-###-   .             .-##+  .-+-.++.--..--.+--#####+####- .+.-+.   .-+-. -###.-.                      +#.     \n           .####-.                .-##+ .+#-  .-..-. .####+++#++#---+- ...-.      .##.+###-#.        .  ..        .##+.    \n          .+#####-.  ....          .###..#+.   ..    .+.  -######.   . ..   ...    +#####--##+-....   ..+#+..  .-+####..   \n       ...+##+.+########--..     ..--###-##.         .-.   +#+-##  .-+-.++..-+..   -####-.-########-..-################..  \n        .-###..+#+-#---+####+++++##-.-#####+..  .-....+#-..-##+#+..+##- -##+#+++...+##+. -###.+-++######-.-++#####-.+##-.  \n         .##+..+#..+#.  +##+-+#+.##..-+######-..+#-.+..+##############.  -########-##+.  +###+    ..####+--..+-.+#+.-##.   \n         .+#- .+#-...-. -##+.   .## .+####+-######.-#.+###+#######+.+#-  .-###--. .+#+. .+####-.     .+##-. .-.-##-.-##.   \n         .+#- .+#-   .+####.   -###  .-###-..-+##+-++..+##...-+-.. .+#-   .+#+..   +#+..-.#.-###-    .-#-. .  .+##. -##..  \n         .##-  -#-  ...-+##.   .-##.--.##-   ..-####+. -##...-#... .-#+-.-+##+.    -##+-+... .-###-  .--.     .+#-. +##.   \n         .+#+. .-+. .-+++#+.    +#####-##.     -###+--.-##-..-#-   .-##-.-++#+.    -##-.##.    .####++..--   .-+...-##-.   \n         .-##.  .-++...-+#+. ..+#####--#+.  .-+###--.+-+###-.-#-.  .-#-.-#+-#+.    .##. +##+.   .+######+.  .... .+###.    \n.   .     .##-    ...   .#+.+####.##+.-#+..-+#++#++-.-####-..-#-.  .+-.-##--##-    .+#-.-#####.  ..-###-.       .-##+.     \n     .    .-#+.         -#####-...##+.-##+##+.-+##+.-.-###. .-#-.  ..-##+..+##-    -##+--##.-##.  ..+##.   . ..-+#-.       \n            .##-.     .+####..   .##--##+.... .+#+. -+.+#+. .+#-. .-####-..+##+.   .+##-+##-...#.  .-##.    ..-.     .     \n    .        .+#+.   .-+##-.     .##-#+#-.    .+#+. .####+. .-#. .##-##- .+###+.  . .##-.###.   .. ..##-  .             .  \n             ...+#+--.  +#-.    -###..##+.   .-+#++-.-###-. ..#..-+..##--..-##+.    .##..+#+. .     .##-   ..              \n                .....  .+##.    +###..###-  .--+##+. .-##-....#..-- .##--#++##+.    .+#.-##+.     ...##- .-+-           .  \n      .                .+#-.    .##+ .##+.  -+-+#+. .--###+...#.... .##-..+###+...   +##-###.     ..####+##-.              \n    .                  .#+.      +#-..##-.  .++##-.-#--##+....# .. .-##-  .+#####+.. +##-+##+      .+#####-.               \n                .-..   +#+.      ##-#-##... .-######--#####+..# ...-+##-  .+#---+##++####-+##+.     .-##-.                 \n      .          .++-.-##+..    .###++###-   .-####--###++##-.+ ..-####-  .+-.   .-##-.+##.-###+-. .-+#+                   \n     .           ..+######-.  .-###-.###+.. . -###+.       -##.-##+-+-#+  ...    . -.   +##-.####-..##+.                   \n                    .-###+.  .###-.-###+. .   -#-.--.   .  -+-##++  .+#+              .  -##+..######-         .           \n                      .##-. -##-..###-.       -+.          -#+++#+  .-#-                  ..-##-.#####-                    \n      .        .      -##--##+. -##-.         ..         ..+##+##+-- .+.                    . ...++#####-.       ..        \n      .              -#####+...+##-    .           .     -+########+. .                   .  . ... .-######+---+#+. .      \n                   .-#####-..+#+-.                        +########.                                 ..-+#######+.         \n                 ..+####+.. ...                         . .#######.                                      ..-+#+-.          \n             ...+######-.                .           ..    -#####-                                                         \n      ..----+#######+-.     .     .                         .###- .                                                        \n       .-######++-..              .                          .#-                                                           \n                         .                                    .                                                            \n                                    .                                 .        .                                           \n                      .      .        .                              .                                     .               \n                           .       .   .                                                            .                      ", "                                         .                                                  .                              \n                                                                                                                           \n                                                                                                                           \n            .                       .                                                          .                           \n                .                           .                              .               .                               \n                                                                    .                          .                       .   \n                                                                   .                                          ..       .   \n                                                     .                                                                     \n                                                  ..--.             ..+.                                                   \n                                               .  .-#-      .-.     .-#+.                                                  \n                                       .         .+##-.     +#+    ..###+-.                                                \n                                       .      ..-#####-..   -#-  ..-##--+#+-...+-....                                .  .  \n               .--.                   ..+#+. .-#+..#####.. .##+  .+#++##..##+-#+--+##+-.                                   \n              -+-.   .          .   .-##..   -#+..+-+#+##+. +#+ .#+#+..++.-#-..    ..+###+.                     ..+-.      \n            .-##-.    .          . .+##.     -#+.-++-.  .+#+-#+--...--.-#.-+-       ..+##+.                       .+-.     \n         . .-###-                 .-##+  .-+-.++.--..--.+--#####+####- .+.-+.   .-+-. -###.-.                      +#.     \n           .####-.                .-##+ .+#-  .-..-. .####+++#++#---+- ...-.      .##.+###-#.        .  ..        .##+.    \n          .+#####-.  ....          .###..#+.   ..    .+.  -######.   . ..   ...    +#####--##+-....   ..+#+..  .-+####..   \n       ...+##+.+########--..     ..--###-##.         .-.   +#+-##  .-+-.++..-+..   -####-.-########-..-################..  \n        .-###..+#+-#---+####+++++##-.-#####+..  .-....+#-..-##+#+..+##- -##+#+++...+##+. -###.+-++######-.-++#####-.+##-.  \n         .##+..+#..+#.  +##+-+#+.##..-+######-..+#-.+..+##############.  -########-##+.  +###+    ..####+--..+-.+#+.-##.   \n         .+#- .+#-...-. -##+.   .## .+####+-######.-#.+###+#######+.+#-  .-###--. .+#+. .+####-.     .+##-. .-.-##-.-##.   \n         .+#- .+#-   .+####.   -###  .-###-..-+##+-++..+##...-+-.. .+#-   .+#+..   +#+..-.#.-###-    .-#-. .  .+##. -##..  \n         .##-  -#-  ...-+##.   .-##.--.##-   ..-####+. -##...-#... .-#+-.-+##+.    -##+-+... .-###-  .--.     .+#-. +##.   \n         .+#+. .-+. .-+++#+.    +#####-##.     -###+--.-##-..-#-   .-##-.-++#+.    -##-.##.    .####++..--   .-+...-##-.   \n         .-##.  .-++...-+#+. ..+#####--#+.  .-+###--.+-+###-.-#-.  .-#-.-#+-#+.    .##. +##+.   .+######+.  .... .+###.    \n.   .     .##-    ...   .#+.+####.##+.-#+..-+#++#++-.-####-..-#-.  .+-.-##--##-    .+#-.-#####.  ..-###-.       .-##+.     \n     .    .-#+.         -#####-...##+.-##+##+.-+##+.-.-###. .-#-.  ..-##+..+##-    -##+--##.-##.  ..+##.   . ..-+#-.       \n            .##-.     .+####..   .##--##+.... .+#+. -+.+#+. .+#-. .-####-..+##+.   .+##-+##-...#.  .-##.    ..-.           \n             .+#+.   .-+##-.     .##-#+#-.    .+#+. .####+. .-#. .##-##- .+###+.  . .##-.###.   .. ..##-  .                \n             ...+#+--.  +#-.    -###..##+.   .-+#++-.-###-. ..#..-+..##--..-##+.    .##..+#+.       .##-   ..              \n                .....  .+##.    +###..###-  .--+##+. .-##-....#..-- .##--#++##+.    .+#.-##+.     ...##- .-+-           .  \n      .                .+#-.    .##+ .##+.  -+-+#+. .--###+...#.... .##-..+###+...   +##-###.     ..####+##-.              \n    .                  .#+.      +#-..##-.  .++##-.-#--##+....# .. .-##-  .+#####+.. +##-+##+      .+#####-.               \n                .-..   +#+.      ##-#-##... .-######--#####+..# ...-+##-  .+#---+##++####-+##+.     .-##-.                 \n      .          .++-.-##+..    .###++###-   .-####--###++##-.+ ..-####-  .+-.   .-##-.+##.-###+-. .-+#+                   \n     .           ..+######-.  .-###-.###+.. . -###+.       -##.-##+-+-#+  ...    . -.   +##-.####-..##+.                   \n                    .-###+.  .###-.-###+. .   -#-.--.      -+-##++  .+#+                 -##+..######-                     \n                      .##-. -##-..###-.       -+.          -#+++#+  .-#-                  ..-##-.#####-                    \n      .        .      -##--##+. -##-.         ..         ..+##+##+-- .+.                    . ...++#####-.       ..        \n      .              -#####+...+##-    .                 -+########+. .                      . ... .-######+---+#+. .      \n                   .-#####-..+#+-.                    .   +########.                                 ..-+#######+.         \n                 ..+####+.. ...                         . .#######.                                      ..-+#+-.          \n             ...+######-.                .           ..    -#####-                         .                               \n      ..----+#######+-.     .     .                         .###- .                                                        \n       .-######++-..              .                          .#-                                                           \n                                                              .                                                            \n                                                                      .        .                    .                      \n                             .        .                              .                                     .               \n                           .           .                                                                                   "];
-  var reduce = (window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches) ||
-               document.documentElement.classList.contains('lite');
+  var reduce = (window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches);
 
   var rows = 50, cols = 123;
   var i = 0, timer = 0;
