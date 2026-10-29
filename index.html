@@ -13,14 +13,14 @@
 <meta property="og:type" content="website" />
 <meta property="og:locale" content="id_ID" />
 <meta property="og:site_name" content="bagus-dev" />
-<meta property="og:image" content="https://0nnyx-code.github.io/bagus-dev-portfolio/assets/og-image.png" />
+<meta property="og:image" content="assets/og-image.png" />
 <meta property="og:image:width" content="1200" />
 <meta property="og:image:height" content="630" />
 <meta property="og:image:alt" content="bagus-dev — web yang enak dipandang, enak dipakai" />
 <meta name="twitter:card" content="summary_large_image" />
 <meta name="twitter:title" content="Web Designer Jogja & Jasa Bikin Website UMKM — bagus-dev" />
 <meta name="twitter:description" content="Web yang enak dipandang, enak dipakai. Landing page, web toko, profil usaha — dari Bantul, Yogyakarta." />
-<meta name="twitter:image" content="https://0nnyx-code.github.io/bagus-dev-portfolio/assets/og-image.png" />
+<meta name="twitter:image" content="assets/og-image.png" />
 <meta name="theme-color" content="#F3EFE6" />
 <link rel="icon" type="image/png" href="assets/favicon.png" />
 <link rel="preconnect" href="https://fonts.googleapis.com" />
@@ -51,7 +51,7 @@
 <script>
   (function () {
     try {
-      var t = localStorage.getItem('bdv-theme') || 'light';
+      var t = localStorage.getItem('bdv-theme') || (window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light');
       t = t === 'dark' ? 'dark' : 'light';
       var p = localStorage.getItem('bdv-preset') || '';
       if (p !== 'neon' && p !== 'acid' && p !== 'sunset') p = '';
@@ -605,9 +605,10 @@
     .w-row:active { transform: translateX(4px) scale(0.997); }
     .chat-send:active svg { transform: translateX(3px); }
   }
-  .chat-msg, .chat-typing { transition: opacity .22s var(--ease-out), translate .22s var(--ease-out); }
-  @starting-style { .chat-msg, .chat-typing { opacity: 0; translate: 0 10px; } }
-  @media (prefers-reduced-motion: reduce) { .chat-msg, .chat-typing { transition: none; } }
+  /* entri bubble chat — pakai keyframes (lebih andal dari @starting-style saja) */
+  .chat-msg, .chat-typing { animation: chatIn .26s var(--ease-out) both; }
+  @keyframes chatIn { from { opacity: 0; translate: 0 10px; } to { opacity: 1; translate: 0 0; } }
+  @media (prefers-reduced-motion: reduce) { .chat-msg, .chat-typing { animation: none; } }
   @media (hover: hover) and (pointer: fine) and (prefers-reduced-motion: no-preference) {
     .pcard { transition: transform .25s var(--ease-out); }
     .pcard:hover { transform: translateY(-3px) rotate(-1deg); }
@@ -947,7 +948,7 @@
     .jcard:hover { transform: translate(-4px, -6px); box-shadow: 12px 14px 0 var(--ikb-2), var(--lift); }
   }
   .jcard-img { aspect-ratio: 16 / 9; overflow: hidden; border-bottom: var(--bd); position: relative; }
-  .jcard-img img { width: 100%; height: 100%; object-fit: cover; transition: transform .5s var(--ease-out); }
+  .jcard-img img { width: 100%; height: 100%; object-fit: cover; transition: transform .5s var(--ease-out), scale .5s var(--ease-out); }
   @media (hover: hover) and (pointer: fine) { .jcard:hover .jcard-img img { transform: scale(1.1) rotate(1deg); } }
   .jcard-date { position: absolute; top: 10px; left: 10px; background: var(--chip-bg); color: var(--chip-fg); font-family: "Space Grotesk", sans-serif; font-weight: 700; font-size: 10.5px; letter-spacing: .12em; text-transform: uppercase; padding: 4px 8px; border: var(--bd2); border-color: var(--paper); }
   .jcard-body { padding: 16px 18px 18px; flex: 1; display: flex; flex-direction: column; }
@@ -964,6 +965,16 @@
   .demo-frame { position: relative; justify-self: center; width: min(100%, 420px); aspect-ratio: 9 / 16; max-height: 76vh; background: var(--ink); border: var(--bd2); box-shadow: var(--shadow); overflow: hidden; transition: transform .3s var(--ease-out); }
   @media (hover: hover) and (pointer: fine) and (prefers-reduced-motion: no-preference) { .demo-frame:hover { transform: translateY(-4px) rotate(-.6deg); } }
   .demo-frame iframe { display: block; width: 100%; height: 100%; border: 0; }
+  /* placeholder: bingkai nggak kosong-hitam selagi reel disiapkan */
+  .demo-poster { position: absolute; inset: 0; z-index: 2; display: grid; place-content: center; justify-items: center; gap: 10px; text-align: center; background:
+      radial-gradient(120% 80% at 30% 0%, rgba(255,66,28,.22), transparent 60%),
+      repeating-linear-gradient(-45deg, rgba(243,239,230,.05) 0 2px, transparent 2px 12px),
+      var(--ink); transition: opacity .35s var(--ease-out), visibility 0s .35s; }
+  .demo-frame.is-ready .demo-poster { opacity: 0; visibility: hidden; transition: opacity .35s var(--ease-out), visibility 0s; }
+  .demo-poster-star { font-size: 26px; color: var(--flame); animation: demoPulse 1.8s ease-in-out infinite; }
+  .demo-poster-txt { font-family: "JetBrains Mono", monospace; font-size: 10px; letter-spacing: .22em; text-transform: uppercase; color: rgba(243,239,230,.6); }
+  @keyframes demoPulse { 0%, 100% { opacity: .35; transform: scale(.9); } 50% { opacity: 1; transform: scale(1.05); } }
+  @media (prefers-reduced-motion: reduce) { .demo-poster-star { animation: none; opacity: .9; } }
   .demo-corner { position: absolute; width: 14px; height: 14px; border-color: var(--flame); border-style: solid; border-width: 0; pointer-events: none; }
   .dc-tl { top: -7px; left: -7px; border-top-width: 3px; border-left-width: 3px; }
   .dc-tr { top: -7px; right: -7px; border-top-width: 3px; border-right-width: 3px; }
@@ -983,6 +994,8 @@
   /* ===== PRICING ===== */
   .price-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 18px; align-items: stretch; }
   .price { background: var(--card); border: var(--bd); box-shadow: var(--shadow), var(--lift); padding: 26px 22px; display: flex; flex-direction: column; position: relative; transition: transform .3s var(--ease-out), box-shadow .3s var(--ease-out); }
+  .price::after { content: ""; position: absolute; inset: 0; pointer-events: none; background: radial-gradient(circle at var(--mx, 50%) var(--my, 0%), color-mix(in srgb, var(--yolk) 22%, transparent), transparent 58%); opacity: 0; transition: opacity .3s var(--ease); }
+  @media (hover: hover) and (pointer: fine) { .price:hover::after { opacity: 1; } }
   .price:nth-child(2) { background: var(--inv-bg); color: var(--inv-fg); box-shadow: 7px 7px 0 var(--flame), var(--lift); }
   @media (hover: hover) and (pointer: fine) {
     .price:hover { transform: translateY(-8px) rotate(-.5deg); box-shadow: 12px 14px 0 var(--flame), var(--lift); }
@@ -1016,7 +1029,7 @@
   .pcard { position: relative; flex: none; width: clamp(210px, 24vw, 280px); background: var(--card); border: var(--bd); box-shadow: var(--shadow), var(--lift-sm); padding: 8px 8px 10px; transition: transform .3s var(--ease-spring); }
   .pcard:nth-child(odd) { rotate: -1.1deg; } .pcard:nth-child(even) { rotate: 1deg; }
   @media (hover: hover) and (pointer: fine) { .pcard:hover { transform: translateY(-10px) rotate(0deg) scale(1.05); } }
-  .pcard img { width: 100%; aspect-ratio: 4 / 3; object-fit: cover; }
+  .pcard img { width: 100%; aspect-ratio: 4 / 3; object-fit: cover; transition: scale .35s var(--ease-out); }
   .pcard figcaption { margin-top: 8px; display: flex; justify-content: space-between; align-items: center; font-family: "Space Grotesk", sans-serif; font-weight: 700; font-size: 13px; letter-spacing: .1em; text-transform: uppercase; }
   .pcard figcaption svg { width: 10px; height: 10px; animation: spin 4s linear infinite; }
   .lab-hint { text-align: center; margin-top: 18px; font-size: 13px; font-weight: 600; color: var(--ink-soft); }
@@ -1184,14 +1197,7 @@
   .sheet-close { position: absolute; top: 12px; right: 12px; z-index: 3; width: 42px; height: 42px; display: grid; place-items: center; background: var(--card); color: var(--ink); border: var(--bd2); box-shadow: 3px 3px 0 var(--sh-c); transition: background .15s, color .15s, transform .15s, box-shadow .15s; }
   .sheet-close:hover { background: var(--flame); color: var(--ink-fixed); transform: translate(-1px, -1px) rotate(90deg); box-shadow: 4px 4px 0 var(--sh-c); }
   .sheet-close svg { width: 14px; height: 14px; }
-  .sheet-media img {
-  display: block;
-  width: 100%;
-  height: auto;
-  aspect-ratio: auto;
-  object-fit: contain;
-  border-bottom: var(--bd);
-  }
+  .sheet-media img { width: 100%; aspect-ratio: 16 / 8; object-fit: cover; border-bottom: var(--bd); }
   .sheet-body { padding: 24px 26px 30px; }
   .sheet-body h3 { font-family: "Bricolage Grotesque", sans-serif; font-weight: 800; font-size: clamp(26px, 3.6vw, 40px); line-height: 1.02; letter-spacing: -.01em; text-transform: uppercase; margin-top: 2px; }
   .sheet-desc { color: var(--ink-soft); font-size: 15px; margin-top: 10px; max-width: 60ch; }
@@ -1311,7 +1317,7 @@
   .chat-send.is-stop .ic-send { display: none; }
   .chat-send.is-stop .ic-stop { display: block; }
   .chat-send:disabled { opacity: .45; cursor: not-allowed; transform: none; }
-  .chat-note { padding: 0 16px 11px; background: var(--card); color: var(--ink-soft); font-family: "Space Grotesk", sans-serif; font-size: 10px; line-height: 1.35; letter-spacing: .01em; }
+  .chat-note { padding: 0 16px 11px; background: transparent; color: var(--ink-soft); font-family: "Space Grotesk", sans-serif; font-size: 10px; line-height: 1.35; letter-spacing: .01em; }
   .chat-note a { color: var(--flame-deep); font-weight: 700; text-decoration: underline; text-underline-offset: 2px; }
   html[data-theme="dark"] .chat-note a, html[data-preset] .chat-note a { color: var(--yolk); }
   .chat-widget.open .chat-chip { animation: chatChipIn .35s var(--ease-out) backwards; }
@@ -1512,7 +1518,14 @@
 
   /* v14 micro: press feedback di layar sentuh + state topbar sudah di atas */
   @media (hover: none) {
-    .hero-ai:active, .icon-btn:active, .jcard:active, .price:active, .foot-lockup:active, .to-top:active { transform: scale(.985) translateY(1px); transition-duration: .06s; }
+    .hero-ai:active, .icon-btn:active, .jcard:active, .price:active, .foot-lockup:active, .to-top:active,
+    .pcard:active, .demo-frame:active, .chat-chip:active, .chip-btn:active { transform: scale(.985) translateY(1px); transition-duration: .06s; }
+    .pcard:active { transform: scale(.975) rotate(-1deg); }
+    .pcard:active img { scale: 1.06; }
+    .filter:active, .sec-tag:active { transform: translateY(-1px) scale(.97); background: var(--yolk); color: var(--ink-fixed); }
+    .btn:active, .nav-wa:active, .menu-wa:active, .btn-primary:active { transform: translate(1px, 1px); box-shadow: 2px 2px 0 var(--sh-c); }
+    .chat-send:active svg { transform: translateX(3px); }
+    .jcard:active .jcard-img img { scale: 1.05; }
   }
 
   @media (prefers-reduced-motion: reduce) {
@@ -2440,7 +2453,11 @@
     </div>
     <div class="demo-stage">
       <div class="demo-frame rv-scale" data-cursor data-label="REEL">
-        <iframe src="demo.html?stage=1" title="Demo reel motion design bagus-dev" loading="lazy" allow="autoplay"></iframe>
+        <div class="demo-poster" aria-hidden="true">
+          <span class="demo-poster-star">✦</span>
+          <span class="demo-poster-txt">Menyiapkan reel…</span>
+        </div>
+        <iframe id="reelFrame" src="about:blank" data-src="demo.html?stage=1" title="Demo reel motion design bagus-dev" loading="eager" allow="autoplay"></iframe>
         <span class="demo-corner dc-tl" aria-hidden="true"></span>
         <span class="demo-corner dc-tr" aria-hidden="true"></span>
         <span class="demo-corner dc-bl" aria-hidden="true"></span>
@@ -2567,6 +2584,7 @@
     </button>
     <button class="dock-btn" id="dockTheme" type="button" aria-label="Preset tema"><span class="dock-tip">Preset tema</span><svg viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M10 2a8 8 0 1 0 8 8c0-1.1-.9-2-2-2h-1.5a2 2 0 0 1 0-4H15"/><circle cx="6.5" cy="10" r="1"/><circle cx="8" cy="6.5" r="1"/><circle cx="12" cy="6.5" r="1"/></svg></button>
     <button class="dock-btn" id="dockSound" type="button" aria-label="Toggle suara"><span class="dock-tip">Suara</span><svg viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M4 8v4h3l4 3V5L7 8H4z"/><path d="M14 6a4 4 0 0 1 0 8"/></svg></button>
+    <button class="dock-btn" id="dockFx" type="button" aria-label="Efek animasi" aria-pressed="true"><span class="dock-tip">Efek: penuh</span><svg viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linejoin="round"><path d="M8.4 2.2l1.5 4.1 4.1 1.5-4.1 1.5-1.5 4.1-1.5-4.1L2.8 7.8l4.1-1.5z"/><path d="M15.4 12.2l.8 2.1 2.1.8-2.1.8-.8 2.1-.8-2.1-2.1-.8 2.1-.8z"/></svg></button>
     <button class="dock-btn" id="dockShare" type="button" aria-label="Bagikan"><span class="dock-tip">Bagikan</span><svg viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.8"><circle cx="4" cy="10" r="2"/><circle cx="16" cy="4" r="2"/><circle cx="16" cy="16" r="2"/><path d="M6 10l8-5M6 10l8 5"/></svg></button>
     <button class="dock-btn" id="dockParty" type="button" aria-label="Party mode"><span class="dock-tip">Party!</span><svg viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M3 17l4-10 10 4-14 6z"/><path d="M9 8l1-2M12 10l2-1"/></svg></button>
     <button class="dock-btn" id="dockHelp" type="button" aria-label="Bantuan keyboard"><span class="dock-tip">Shortcut (?)</span><svg viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.8"><circle cx="10" cy="10" r="7"/><path d="M8 8c0-1.1.9-2 2-2s2 .9 2 2c0 1.5-2 1.5-2 3"/><circle cx="10" cy="14.5" r=".8" fill="currentColor"/></svg></button>
@@ -2665,13 +2683,23 @@
   var REDUCE = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
   var FINE = window.matchMedia('(hover: hover) and (pointer: fine)').matches;
   var htmlEl = document.documentElement;
+  /* LITE = mode hemat. Dulu: deviceMemory<=4 / core<=4 → HP kelas menengah
+     otomatis ke-lite, jadi hampir semua animasi mati. Sekarang cuma kalau
+     jaringan benar-benar hemat/lemot, atau user sendiri yang minta. */
+  function readFxPref() {
+    try {
+      var v = localStorage.getItem('bdv-fx');
+      return (v === 'full' || v === 'lite') ? v : '';
+    } catch (e) { return ''; }
+  }
+  var FX_PREF = readFxPref();
   var LITE = (function () {
+    if (FX_PREF === 'lite') return true;
+    if (FX_PREF === 'full') return false;
     try {
       var conn = navigator.connection || {};
       if (conn.saveData) return true;
-      if (/2g/.test(conn.effectiveType || '')) return true;
-      if (navigator.deviceMemory && navigator.deviceMemory <= 4) return true;
-      if (navigator.hardwareConcurrency && navigator.hardwareConcurrency <= 4) return true;
+      if (/^(slow-)?2g$/.test(conn.effectiveType || '')) return true;
     } catch (e) {}
     return false;
   })();
@@ -2881,6 +2909,58 @@
     dockSound.classList.toggle('active', !soundOn);
     dockSound.addEventListener('click', function () { setSound(!soundOn); });
   }
+
+  /* ---- toggle efek penuh / hemat (ini yang balikin animasi kalau ke-disable) ---- */
+  var dockFx = $('#dockFx');
+  function paintFxBtn() {
+    if (!dockFx) return;
+    var full = !htmlEl.classList.contains('lite');
+    dockFx.classList.toggle('active', !full);
+    dockFx.setAttribute('aria-pressed', String(full));
+    var tip = dockFx.querySelector('.dock-tip');
+    if (tip) tip.textContent = full ? 'Efek: penuh' : 'Efek: hemat';
+  }
+  function setFx(full, silent) {
+    htmlEl.classList.toggle('lite', !full);
+    try { localStorage.setItem('bdv-fx', full ? 'full' : 'lite'); } catch (e) {}
+    paintFxBtn();
+    if (!silent) toast(full ? 'Efek penuh aktif ✦' : 'Mode hemat — animasi diringankan');
+    if (full) beep(880, .09, 'sine', .03);
+  }
+  if (dockFx) {
+    paintFxBtn();
+    dockFx.addEventListener('click', function () { setFx(htmlEl.classList.contains('lite')); });
+  }
+
+  /* ---- adaptive: kalau perangkat BENERAN di bawah 20fps, baru turun ke mode hemat ---- */
+  (function autoLite() {
+    if (LITE || REDUCE || FX_PREF === 'full') return;
+    var WIN = 2000, frames = 0, t0 = 0, slow = 0, tried = 0;
+    function sample(now) {
+      /* tab disembunyikan → rAF berhenti, jadi hitungan fps bakal palsu rendah.
+         reset jendela sampel biar nggak salah tuduh perangkat lemot. */
+      if (document.hidden) { frames = 0; t0 = 0; requestAnimationFrame(sample); return; }
+      if (!t0) t0 = now;
+      frames++;
+      if (now - t0 < WIN) { requestAnimationFrame(sample); return; }
+      var fps = frames / ((now - t0) / 1000);
+      frames = 0; t0 = 0; tried++;
+      if (fps < 20) slow++; else slow = 0;
+      /* butuh 2 jendela lemot beruntun → nggak salah turun gara-gara loading awal */
+      if (slow >= 2) {
+        htmlEl.classList.add('lite');
+        try { localStorage.setItem('bdv-fx', 'lite'); } catch (e) {}
+        paintFxBtn();
+        console.info('[bdv] ' + fps.toFixed(0) + 'fps — mode hemat otomatis. Dock → Efek buat maksa penuh.');
+        return;
+      }
+      if (tried >= 3) return;
+      requestAnimationFrame(sample);
+    }
+    document.addEventListener('bdv:ready', function () {
+      setTimeout(function () { requestAnimationFrame(sample); }, 900);
+    }, { once: true });
+  })();
 
   /* ================= LOADER ================= */
   var readyFired = false;
@@ -3528,6 +3608,7 @@
       topbar.classList.toggle('is-stuck', y > 12);
       lastY = y;
     }, { passive: true });
+    topbar.classList.toggle('is-stuck', scrollY > 12);
   }
 
   /* ================= REVEAL + TEXT SPLIT (OPTIMIZED) ================= */
@@ -3560,20 +3641,71 @@
     el.innerHTML = out;
   }
 
-  var io = new IntersectionObserver(function (entries) {
-    entries.forEach(function (e) {
-      if (!e.isIntersecting) return;
-      e.target.classList.add('in');
-      if (e.target.hasAttribute('data-split')) splitText(e.target, 0);
-      var inner = e.target.querySelector('[data-split]');
-      if (inner) splitText(inner, 0);
-      io.unobserve(e.target);
-    });
-  }, { threshold: 0.12, rootMargin: '0px 0px -6% 0px' });
-  $$('.rv, .rv-slideL, .rv-slideR, .rv-rotate, .rv-scale, .rv-flip').forEach(function (el) {
-    if (el.closest && el.closest('#hero')) return;
-    io.observe(el);
+  var REVEAL_SEL = '.rv, .rv-slideL, .rv-slideR, .rv-rotate, .rv-scale, .rv-flip';
+  function revealNow(el) {
+    if (!el || el.classList.contains('in')) return;
+    el.classList.add('in');
+    if (el.hasAttribute('data-split')) splitText(el, 0);
+    var inner = el.querySelector('[data-split]');
+    if (inner) splitText(inner, 0);
+  }
+
+  var io = null;
+  if ('IntersectionObserver' in window) {
+    io = new IntersectionObserver(function (entries) {
+      entries.forEach(function (e) {
+        if (!e.isIntersecting) return;
+        revealNow(e.target);
+        io.unobserve(e.target);
+      });
+    }, { threshold: 0.12, rootMargin: '0px 0px -6% 0px' });
+  }
+
+  var revealEls = $$(REVEAL_SEL);
+  var pendingReveal = [];
+  revealEls.forEach(function (el) {
+    if (el.closest && el.closest('#hero')) return;   /* hero punya timeline sendiri */
+    if (io) io.observe(el);
+    if (!el.classList.contains('in')) pendingReveal.push(el);
   });
+
+  /* watchdog: kalau IO telat/nggak jalan (iframe, scroll aneh, browser hemat),
+     elemen yang sudah kelihatan tetap dipaksa muncul. Tanpa ini section bisa
+     kosong selamanya karena opacity:0. Sengaja ambangnya lebih konservatif
+     dari IO, jadi dalam kondisi normal IO yang menang (animasi tetap pas). */
+  function sweepReveal() {
+    if (!pendingReveal.length) return;
+    var vh = window.innerHeight || 800;
+    pendingReveal = pendingReveal.filter(function (el) {
+      if (el.classList.contains('in')) return false;
+      var r = el.getBoundingClientRect();
+      if (r.width === 0 && r.height === 0) return true;
+      /* sudah lewat atau baru masuk viewport → wajib tampil (termasuk yang
+         kelewat gara-gara lompat anchor atau scroll cepat) */
+      if (r.top < vh * 0.86) { revealNow(el); return false; }
+      return true;
+    });
+  }
+  var sweepTimer = 0, lastSweep = 0;
+  function queueSweep() {
+    if (sweepTimer) return;
+    var wait = Math.max(0, 100 - (Date.now() - lastSweep));   /* max ~10x/detik, bukan tiap frame */
+    sweepTimer = setTimeout(function () {
+      sweepTimer = 0;
+      lastSweep = Date.now();
+      requestAnimationFrame(sweepReveal);
+    }, wait);
+  }
+  addEventListener('scroll', queueSweep, { passive: true });
+  addEventListener('resize', queueSweep);
+  addEventListener('pageshow', queueSweep);
+  document.addEventListener('bdv:ready', function () {
+    setTimeout(sweepReveal, 500);
+    setTimeout(sweepReveal, 1600);
+  });
+  setTimeout(sweepReveal, 1400);
+  setTimeout(sweepReveal, 3000);
+  sweepReveal();
 
   /* ================= STATS ================= */
   var statNums = $$('.stat-n');
@@ -4681,7 +4813,10 @@ try {
       sendBtn.classList.toggle('is-stop', on);
       sendBtn.setAttribute('aria-label', on ? 'Stop jawaban' : 'Kirim pesan');
     }
-    if (input) input.setAttribute('aria-busy', on ? 'true' : 'false');
+    if (input) {
+      input.setAttribute('aria-busy', on ? 'true' : 'false');
+      input.placeholder = on ? 'Tunggu jawaban selesai…' : 'Tulis pesan...';
+    }
   }
 
   function escapeHTML(s) {
@@ -4786,8 +4921,41 @@ try {
     var bubble = null;
     var gotDelta = false;
 
+    // ===== CLIENT-SIDE ONLY MODE (GitHub Pages compatible) =====
+    // No backend needed - uses local keyword responses with simulated streaming
+    // To enable remote AI: set window.BDV_CHAT_API = 'https://your-api.com/chat'
+    var apiUrl = (window.BDV_CHAT_API && String(window.BDV_CHAT_API).trim()) || null;
+    var useRemote = !!apiUrl;
+
+    if (!useRemote) {
+      // Simulate streaming with local keyword response
+      var localReply = replies[keywordKey(text)] || replies.default;
+      var words = localReply.split(' ');
+      var streamDelay = 35; // ms per word
+
+      removeNode(typing);
+      bubble = addMsg('', 'bot');
+      bubble.classList.add('is-streaming');
+      current.bubble = bubble;
+      current.raw = '';
+      setStatus('busy', 'Membalas…');
+
+      for (var i = 0; i < words.length; i++) {
+        if (current.aborted) break;
+        current.raw += (i > 0 ? ' ' : '') + words[i];
+        paint(bubble, current.raw);
+        await new Promise(function (r) { setTimeout(r, streamDelay + Math.random() * 20); });
+      }
+
+      if (!current.aborted) {
+        finishStream(current.raw, false);
+      }
+      return;
+    }
+
+    // ===== REMOTE API MODE (for Vercel/Netlify/etc) =====
     try {
-      var res = await fetch('/api/chat', {
+      var res = await fetch(apiUrl, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ messages: history }),
@@ -4852,6 +5020,7 @@ try {
                 bubble = addMsg('', 'bot');
                 bubble.classList.add('is-streaming');
                 current.bubble = bubble;
+                setStatus('busy', 'Membalas…');
               }
               current.raw += obj.delta;
               paint(bubble, current.raw);
@@ -4898,11 +5067,12 @@ try {
 
       removeNode(bubble);
 
+      // FIX: Use the `text` parameter (was out of scope in catch block)
+      var local = replies[keywordKey(text)] || replies.default;
       if (e && e.status === 429) {
         addMsg('Sabar ya, lagi rame 🙏 Coba lagi 2–3 menit, atau langsung WA: wa.me/62882003160605', 'bot', { error: true });
         setStatus('online', onlineLabel);
       } else {
-        var local = replies[keywordKey(text)] || replies.default;
         addMsg(local, 'bot');
         history.push({ role: 'assistant', content: local });
         announce(local);
@@ -5025,11 +5195,10 @@ try {
 
   document.addEventListener('click', function (e) {
     if (!widget.classList.contains('open')) return;
-    if (
-  widget.contains(e.target) ||
-  fab.contains(e.target) ||
-  (heroAi && heroAi.contains(e.target))
-) return;
+    var cmdk = document.getElementById('cmdk');
+    if (widget.contains(e.target) || fab.contains(e.target)) return;
+    if (heroAi && heroAi.contains(e.target)) return;
+    if (cmdk && cmdk.contains(e.target)) return;
     close();
   });
 })();
@@ -5147,6 +5316,60 @@ try {
     var r = band.getBoundingClientRect();
     if (r.bottom > -120 && r.top < (window.innerHeight || 700) + 120) start();
   });
+})();
+</script>
+<script>
+/* ================= DEMO REEL: load cepat + pause saat nggak kelihatan ================= */
+(function () {
+  'use strict';
+  var frame = document.getElementById('reelFrame');
+  if (!frame) return;
+  var box = frame.closest ? frame.closest('.demo-frame') : frame.parentNode;
+  var src = frame.getAttribute('data-src');
+  var started = false, visible = false;
+
+  function send(play) {
+    if (!started || !frame.contentWindow) return;
+    try { frame.contentWindow.postMessage({ bdv: 'reel', play: !!play }, location.origin); } catch (e) {}
+  }
+
+  function start() {
+    if (started || !src) return;
+    started = true;
+    frame.src = src;
+  }
+
+  frame.addEventListener('load', function () {
+    if (!started) return;          /* abaikan load awal about:blank */
+    box.classList.add('is-ready'); /* sembunyikan poster → reel kelihatan langsung */
+    send(visible);
+  });
+
+  /* mulai dimuat begitu section demo mendekat (≈2 layar sebelumnya) */
+  if ('IntersectionObserver' in window) {
+    var nearIO = new IntersectionObserver(function (entries) {
+      for (var i = 0; i < entries.length; i++) {
+        if (entries[i].isIntersecting) { start(); nearIO.disconnect(); return; }
+      }
+    }, { rootMargin: '250% 0px' });
+    nearIO.observe(box);
+  }
+
+  /* jaring pengaman: tetap dimuat setelah halaman selesai load */
+  function kick() { setTimeout(start, 500); }
+  if (document.readyState === 'complete') kick();
+  else window.addEventListener('load', kick, { once: true });
+
+  /* play cuma saat kelihatan — setelah discroll lewat, reel berhenti (hemat CPU) */
+  if ('IntersectionObserver' in window) {
+    new IntersectionObserver(function (entries) {
+      visible = entries[0].isIntersecting;
+      send(visible);
+    }, { threshold: 0.05 }).observe(box);
+  } else {
+    visible = true;
+  }
+  document.addEventListener('visibilitychange', function () { send(!document.hidden && visible); });
 })();
 </script>
 </body>
