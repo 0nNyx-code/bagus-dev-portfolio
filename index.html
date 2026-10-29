@@ -5310,9 +5310,11 @@ try {
   }
 
   function finalize(c, raw) {
+    if (c.finalized) return;
+    c.finalized = true;
     var p = parseStream(raw);
     var answer = p.answer;
-    if (!answer && p.thought) answer = p.thought;
+    if (!answer && p.thought) answer = 'Jawabanku kepotong sebelum selesai. Coba tanya lagi dengan kalimat lebih singkat, atau langsung WA ya.';
     if (!answer) answer = 'Aku belum bisa jawab itu. Coba tanya soal harga, layanan, atau proses ya.';
 
     var b = ensureBubble(c);
@@ -5406,6 +5408,11 @@ try {
     }
     if (c.aborted) {
       if (acc.trim()) finalize(c, acc);
+      else {
+        if (c.think) c.think.remove();
+        addMsg('Oke, aku stop. Mau tanya yang lain?', 'bot', { actions: false });
+        setStatus('local', localLabel);
+      }
       return;
     }
     finalize(c, acc);
