@@ -56,7 +56,10 @@ Kalau mengubah harga, samakan di **tiga tempat**: section Harga, `SYSTEM_PROMPT`
 ## Catatan teknis
 
 - Chat memakai SSE (`text/event-stream`) supaya teks muncul bertahap, bukan nunggu penuh.
+- **Thinking UI:** model diminta menulis blok `<thought>…</thought>` (2 baris: apa yang ditanya + fakta yang dipakai). Frontend memecahnya jadi langkah-langkah, menampilkan durasi nyata, lalu melipat panelnya setelah jawaban selesai. Kalau model mengembalikan `reasoning_content`, server mengirimnya sebagai `data: {"think":"…"}`.
+- Fallback: kalau `NVIDIA_API_KEY` kosong atau model EOL, server balas 503/404 dan widget pindah ke jawaban keyword lokal (tanpa error ke user).
 - Rate limit: 20 pesan / 3 menit per IP (best effort, in-memory).
-- Model: `meta/llama-3.2-11b-vision-instruct` — cepat dan cukup buat FAQ.
+- Model: `meta/llama-3.2-11b-vision-instruct` — cepat dan cukup buat FAQ. Bisa diganti lewat env `NIM_MODEL` tanpa ubah kode.
+- Shortcut: `⌘/` / `Ctrl+/` buka-tutup chat; `Esc` menutup; `⌘K` command palette.
 - `demo.html?stage=1` menyembunyikan kontrol dan autoplay-loop, dipakai di iframe section Demo.
 - Semua animasi baru dimatikan otomatis saat `prefers-reduced-motion: reduce`.

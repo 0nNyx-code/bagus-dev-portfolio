@@ -1229,105 +1229,187 @@
   .toast { box-shadow: 4px 4px 0 var(--chip-sh); }
   .toast.show { transform: translate(-50%, 0); opacity: 1; visibility: visible; transition: transform .4s var(--ease-spring), opacity .2s var(--ease), visibility 0s 0s; }
 
-  /* ================= CHAT WIDGET (UI polish) ================= */
-  /* Trigger chat sekarang jadi bagian dari dock — tidak ada lagi tombol ngambang di kanan. */
+  .sr-only { position: absolute; width: 1px; height: 1px; padding: 0; margin: -1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; border: 0; }
+
+  /* ================= CHAT WIDGET (v15 — AI thinking) ================= */
+  /* Trigger chat ada di dock + topbar. Panel masuk dari kanan-bawah (origin-aware). */
   .chat-dock { position: relative; background: var(--flame); color: var(--ink-fixed); }
   .chat-dock:hover { background: var(--yolk); color: var(--ink-fixed); }
   .chat-dock > svg { width: 17px; height: 17px; }
   .chat-fab-badge { position: absolute; top: -6px; right: -6px; min-width: 19px; height: 19px; padding: 0 5px; border-radius: 999px; background: var(--ikb); color: var(--on-ikb); font-family: "Space Grotesk", sans-serif; font-weight: 700; font-size: 10.5px; display: grid; place-items: center; border: 2px solid var(--ink); }
-  .chat-widget { position: fixed; right: 18px; bottom: 18px; z-index: 590; width: min(360px, calc(100vw - 36px)); transform: translateY(20px) scale(.96); opacity: 0; pointer-events: none; visibility: hidden; transition: transform .3s var(--ease-out), opacity .25s var(--ease), visibility 0s .3s; }
-  .chat-widget.open { transform: none; opacity: 1; pointer-events: auto; visibility: visible; transition: transform .3s var(--ease-out), opacity .25s var(--ease), visibility 0s 0s; }
-  .chat-panel { background: var(--card); color: var(--ink); border: var(--bd); box-shadow: 10px 10px 0 var(--flame); overflow: hidden; display: flex; flex-direction: column; max-height: 70vh; }
-  .chat-head { display: flex; align-items: center; gap: 12px; padding: 14px 16px; border-bottom: var(--bd2); background: var(--paper-2); }
-  .chat-avatar { width: 38px; height: 38px; border-radius: 999px; background: var(--flame); color: var(--ink-fixed); display: grid; place-items: center; font-family: "Bricolage Grotesque", sans-serif; font-weight: 800; font-size: 18px; border: var(--bd2); overflow: hidden; }
+
+  /* tombol AI di topbar — biar chat nggak terkubur di dalam dock */
+  .ai-btn { position: relative; }
+  .ai-btn .ai-btn-dot { position: absolute; top: -5px; right: -5px; width: 10px; height: 10px; border-radius: 50%; background: var(--flame); border: 2px solid var(--paper); }
+  .ai-btn.is-seen .ai-btn-dot { display: none; }
+
+  .chat-widget {
+    position: fixed; right: 18px; bottom: 18px; z-index: 590;
+    width: min(388px, calc(100vw - 32px));
+    transform-origin: 100% 100%;
+    opacity: 0; visibility: hidden; pointer-events: none;
+    transform: translate3d(0, 14px, 0) scale(.97);
+    transition: opacity 140ms var(--ease), transform 170ms var(--ease-out), visibility 0s 170ms;
+  }
+  .chat-widget.open {
+    opacity: 1; visibility: visible; pointer-events: auto; transform: none;
+    transition: opacity 180ms var(--ease-out), transform 280ms var(--ease-out), visibility 0s 0s;
+  }
+  .chat-panel {
+    display: flex; flex-direction: column;
+    height: min(640px, calc(100dvh - 88px));
+    background: var(--card); color: var(--ink);
+    border: var(--bd); box-shadow: 10px 10px 0 var(--flame);
+    overflow: hidden;
+  }
+
+  .chat-head { flex: none; display: flex; align-items: center; gap: 10px; padding: 12px 12px 12px 14px; border-bottom: var(--bd2); background: var(--paper-2); }
+  .chat-avatar { width: 38px; height: 38px; flex: none; display: grid; place-items: center; background: var(--flame); color: var(--ink-fixed); border: var(--bd2); overflow: hidden; }
   .chat-avatar img { width: 26px; height: 30px; object-fit: contain; display: block; }
-  .chat-title { font-family: "Bricolage Grotesque", sans-serif; font-weight: 800; font-size: 16px; line-height: 1; text-transform: uppercase; }
-  .chat-status { font-family: "JetBrains Mono", sans-serif; font-size: 10px; color: #0ecb81; letter-spacing: .06em; margin-top: 3px; display: flex; align-items: center; gap: 6px; }
-  .chat-dot { display: inline-block; width: 6px; height: 6px; border-radius: 50%; background: #0ecb81; box-shadow: 0 0 8px #0ecb81; animation: chatDotPulse 1.6s ease-in-out infinite; flex: none; }
-  @keyframes chatDotPulse { 0%,100% { opacity: .4; transform: scale(.9); } 50% { opacity: 1; transform: scale(1.15); } }
-
-  /* typing indicator */
-  .chat-typing { align-self: flex-start; display: inline-flex; align-items: center; gap: 4px; padding: 10px 14px; background: var(--paper); border: var(--bd2); }
-  .chat-typing span { width: 6px; height: 6px; border-radius: 50%; background: var(--ink-soft); animation: typingBounce 1.2s ease-in-out infinite; }
-  .chat-typing span:nth-child(2) { animation-delay: .15s; }
-  .chat-typing span:nth-child(3) { animation-delay: .3s; }
-  @keyframes typingBounce { 0%,60%,100% { transform: translateY(0); opacity: .5; } 30% { transform: translateY(-4px); opacity: 1; } }
-
-  /* ripple di tombol chat dalam dock */
-  .chat-dock .rip { position: absolute; border-radius: 50%; background: rgba(255,255,255,.45); transform: scale(0); animation: ripOut .6s linear; pointer-events: none; inset: 0; margin: auto; width: 100%; height: 100%; }
-  @keyframes ripOut { to { transform: scale(2.2); opacity: 0; } }
-  .chat-close { margin-left: auto; width: 44px; height: 44px; display: grid; place-items: center; background: var(--paper); color: var(--ink); border: var(--bd2); cursor: pointer; transition: background .15s, color .15s, transform .15s; }
-  .chat-close:hover { background: var(--flame); color: var(--ink-fixed); transform: rotate(90deg); }
-  .chat-close svg { width: 14px; height: 14px; }
-  .chat-body { flex: 1; overflow-y: auto; padding: 14px 16px; display: flex; flex-direction: column; gap: 10px; min-height: 180px; max-height: 320px; }
-  .chat-msg { max-width: 82%; padding: 10px 12px; font-size: 14px; line-height: 1.45; border: var(--bd2); }
-  .chat-msg.bot { align-self: flex-start; background: var(--paper); color: var(--ink); }
-  .chat-msg.user { align-self: flex-end; background: var(--ikb); color: var(--on-ikb); }
-  .chat-quick { display: flex; flex-wrap: wrap; gap: 8px; padding: 8px 16px; border-top: var(--bd2); background: var(--paper-2); }
-  .chat-chip { font-family: "Space Grotesk", sans-serif; font-weight: 700; font-size: 11.5px; letter-spacing: .04em; padding: 10px 12px; min-height: 44px; display: inline-flex; align-items: center; background: var(--paper); color: var(--ink); border: var(--bd2); cursor: pointer; transition: background .15s, color .15s, transform .15s; }
-  .chat-chip:hover { background: var(--yolk); color: var(--ink-fixed); transform: translateY(-2px); }
-  .chat-input-row { display: flex; gap: 8px; padding: 12px 16px; border-top: var(--bd2); background: var(--card); }
-  .chat-input { flex: 1; min-width: 0; padding: 10px 12px; font-family: "Epilogue", sans-serif; font-size: 14px; color: var(--ink); background: var(--paper); border: var(--bd2); outline: none; transition: border-color .15s, box-shadow .15s; }
-  .chat-input:focus { border-color: var(--flame); box-shadow: 0 0 0 3px rgba(255,66,28,.2); }
-  .chat-send { width: 44px; height: 44px; display: grid; place-items: center; background: var(--flame); color: var(--ink-fixed); border: var(--bd2); cursor: pointer; transition: transform .15s, background .15s; }
-  .chat-send:hover { transform: scale(1.08) rotate(-6deg); }
-  .chat-send svg { width: 16px; height: 16px; }
-  @media (max-width: 520px) {
-    .chat-widget { bottom: 12px; right: 12px; width: calc(100vw - 24px); }
-  }
-  /* layar pendek / HP landscape: jangan sampai header chat kepotong di atas */
-  @media (max-height: 560px) {
-    .chat-widget { top: 10px; bottom: 10px; right: 12px; width: min(380px, calc(100vw - 24px)); }
-    .chat-panel { max-height: 100%; height: 100%; }
-    .chat-body { min-height: 0; max-height: none; }
-    .chat-quick { flex-wrap: nowrap; overflow-x: auto; scrollbar-width: none; }
-    .chat-quick::-webkit-scrollbar { display: none; }
-    .chat-chip { flex: none; min-height: 38px; padding: 8px 10px; }
-  }
-  /* saat chat kebuka, dock disembunyikan biar dua panel nggak tumpuk */
-  body.chat-open .dock { opacity: 0; visibility: hidden; pointer-events: none; transform: translateY(10px); }
-  .dock { transition: opacity .2s var(--ease), transform .2s var(--ease), visibility 0s .2s; }
-  body:not(.chat-open) .dock { transition: opacity .2s var(--ease), transform .2s var(--ease), visibility 0s 0s; }
-  @media (prefers-reduced-motion: reduce) {
-    .chat-dock, .chat-widget, .chat-chip, .chat-close, .chat-send { transition: none !important; }
-    .chat-widget { transform: none; }
-    .chat-dot, .chat-typing span { animation: none !important; }
-  }
-
-  /* ---- chat v14: AI streaming, status, stop, disclaimer ---- */
-  .sr-only { position: absolute; width: 1px; height: 1px; padding: 0; margin: -1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; border: 0; }
-  .chat-title { display: flex; align-items: center; gap: 6px; }
+  html[data-theme="dark"] .chat-avatar img, html[data-preset] .chat-avatar img { filter: invert(1); }
+  .chat-id { min-width: 0; }
+  .chat-title { display: flex; align-items: center; gap: 6px; font-family: "Bricolage Grotesque", sans-serif; font-weight: 800; font-size: 15.5px; line-height: 1; text-transform: uppercase; }
   .chat-ai { font-family: "JetBrains Mono", monospace; font-size: 8.5px; font-weight: 700; letter-spacing: .14em; padding: 2px 5px; background: var(--flame); color: var(--ink-fixed); border: 1.5px solid var(--ink); line-height: 1; }
-  .chat-status { transition: color .2s var(--ease); }
+  .chat-status { font-family: "JetBrains Mono", monospace; font-size: 9.5px; color: #0ecb81; letter-spacing: .04em; margin-top: 4px; display: flex; align-items: center; gap: 6px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; transition: color .2s var(--ease); }
+  .chat-dot { display: inline-block; width: 6px; height: 6px; border-radius: 50%; background: #0ecb81; box-shadow: 0 0 8px #0ecb81; animation: chatDotPulse 1.6s ease-in-out infinite; flex: none; }
+  @keyframes chatDotPulse { 0%, 100% { opacity: .4; transform: scale(.9); } 50% { opacity: 1; transform: scale(1.15); } }
   .chat-status.is-busy { color: var(--flame); }
   .chat-status.is-busy .chat-dot { background: var(--flame); box-shadow: 0 0 8px var(--flame); animation-duration: .8s; }
   .chat-status.is-offline { color: var(--ink-soft); }
   .chat-status.is-offline .chat-dot { background: var(--ink-soft); box-shadow: none; animation: none; }
-  .chat-body { scrollbar-width: thin; scrollbar-color: var(--ink-soft) transparent; }
+  .chat-head-actions { margin-left: auto; display: flex; align-items: center; gap: 6px; flex: none; }
+  .chat-hbtn, .chat-close { width: 34px; height: 34px; display: grid; place-items: center; background: var(--card); color: var(--ink); border: var(--bd2); cursor: pointer; transition: background .15s, color .15s, transform .15s; }
+  .chat-hbtn svg, .chat-close svg { width: 14px; height: 14px; }
+  .chat-hbtn:hover { background: var(--yolk); color: var(--ink-fixed); }
+  .chat-close:hover { background: var(--flame); color: var(--ink-fixed); transform: rotate(90deg); }
+  .chat-hbtn:active, .chat-close:active { transform: scale(.92); }
+  .chat-hbtn.is-spin svg { animation: chatNewSpin .45s var(--ease-out); }
+  @keyframes chatNewSpin { from { transform: rotate(-180deg); opacity: .2; } to { transform: none; opacity: 1; } }
+
+  .chat-body-wrap { position: relative; flex: 1 1 auto; min-height: 0; display: flex; }
+  .chat-body { flex: 1; min-height: 0; overflow-y: auto; padding: 14px; display: flex; flex-direction: column; gap: 10px; scrollbar-width: thin; scrollbar-color: var(--ink-soft) transparent; overscroll-behavior: contain; }
   .chat-body::-webkit-scrollbar { width: 6px; }
   .chat-body::-webkit-scrollbar-thumb { background: color-mix(in srgb, var(--ink) 30%, transparent); }
+
+  .chat-msg { max-width: 86%; padding: 9px 11px; font-size: 13.8px; line-height: 1.5; border: var(--bd2); overflow-wrap: anywhere; }
+  .chat-msg.bot { align-self: flex-start; background: var(--paper); color: var(--ink); }
+  .chat-msg.user { align-self: flex-end; background: var(--ikb); color: var(--on-ikb); }
+  .chat-msg p + p { margin-top: 6px; }
+  .chat-msg ul, .chat-msg ol { margin: 5px 0 0 17px; }
+  .chat-msg li { margin: 2px 0; }
+  .chat-msg strong { font-weight: 800; }
   .chat-msg a { color: inherit; text-decoration: underline; text-underline-offset: 2px; font-weight: 700; }
   .chat-msg code { font-family: "JetBrains Mono", monospace; font-size: .88em; padding: 1px 4px; background: color-mix(in srgb, var(--ink) 8%, transparent); border: 1px solid color-mix(in srgb, var(--ink) 16%, transparent); }
   .chat-msg.is-streaming::after { content: "▍"; display: inline-block; margin-left: 2px; animation: chatCaret .8s steps(1) infinite; }
   @keyframes chatCaret { 50% { opacity: 0; } }
   .chat-msg.chat-error { border-color: var(--flame); background: color-mix(in srgb, var(--flame) 10%, var(--paper)); }
-  .chat-msg.chat-error a { font-weight: 700; }
-  .chat-send .ic-stop { display: none; }
-  .chat-send.is-stop { background: var(--ink); color: var(--paper); }
-  .chat-send.is-stop .ic-send { display: none; }
-  .chat-send.is-stop .ic-stop { display: block; }
-  .chat-send:disabled { opacity: .45; cursor: not-allowed; transform: none; }
-  .chat-note { padding: 0 16px 11px; background: transparent; color: var(--ink-soft); font-family: "Space Grotesk", sans-serif; font-size: 10px; line-height: 1.35; letter-spacing: .01em; }
-  .chat-note a { color: var(--flame-deep); font-weight: 700; text-decoration: underline; text-underline-offset: 2px; }
-  html[data-theme="dark"] .chat-note a, html[data-preset] .chat-note a { color: var(--yolk); }
-  .chat-widget.open .chat-chip { animation: chatChipIn .35s var(--ease-out) backwards; }
+  .chat-msg.chat-note-msg { border-style: dashed; background: var(--paper-2); color: var(--ink-soft); font-size: 12.5px; }
+
+  /* ---- thinking panel: hidup saat berpikir, ringkas setelah selesai ---- */
+  .chat-think { align-self: flex-start; width: 100%; max-width: 86%; border: var(--bd2); background: var(--paper-2); color: var(--ink); }
+  .chat-think-head { position: relative; width: 100%; display: flex; align-items: center; gap: 7px; padding: 7px 9px; font-family: "Space Grotesk", sans-serif; font-size: 10px; font-weight: 700; letter-spacing: .07em; text-transform: uppercase; text-align: left; cursor: pointer; }
+  .chat-think-ico { width: 13px; height: 13px; flex: none; color: var(--flame); }
+  .chat-think-label { flex: 1; min-width: 0; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  .chat-think-time { font-family: "JetBrains Mono", monospace; font-size: 9px; font-weight: 500; letter-spacing: 0; text-transform: none; color: var(--ink-soft); flex: none; }
+  .chat-think-chev { width: 11px; height: 11px; flex: none; color: var(--ink-soft); transition: rotate .22s var(--ease-out); }
+  .chat-think[data-open="true"] .chat-think-chev { rotate: 180deg; }
+  .chat-think-body { display: grid; grid-template-rows: 0fr; opacity: 0; transition: grid-template-rows .28s var(--ease-out), opacity .2s var(--ease); }
+  .chat-think[data-open="true"] .chat-think-body { grid-template-rows: 1fr; opacity: 1; }
+  .chat-think-inner { overflow: hidden; }
+  .chat-think-steps { list-style: none; margin: 0; padding: 0 10px 9px; display: flex; flex-direction: column; gap: 5px; }
+  .chat-think-steps li { position: relative; padding-left: 13px; font-size: 11.5px; line-height: 1.4; color: var(--ink-soft); animation: thinkStep .22s var(--ease-out) both; }
+  .chat-think-steps li::before { content: ""; position: absolute; left: 2px; top: .5em; width: 5px; height: 5px; background: var(--flame); rotate: 45deg; }
+  @keyframes thinkStep { from { opacity: 0; transform: translateY(3px); } to { opacity: 1; transform: none; } }
+  .chat-think.is-live .chat-think-ico { animation: thinkPulse 1.3s ease-in-out infinite; }
+  @keyframes thinkPulse { 0%, 100% { opacity: .35; transform: scale(.85) rotate(0); } 50% { opacity: 1; transform: scale(1.1) rotate(90deg); } }
+  .chat-think.is-live .chat-think-head::after { content: ""; position: absolute; left: 0; right: 0; bottom: 0; height: 2px; background: linear-gradient(90deg, transparent, var(--flame), transparent); background-size: 45% 100%; background-repeat: no-repeat; animation: thinkSweep 1.1s linear infinite; }
+  @keyframes thinkSweep { from { background-position: -45% 0; } to { background-position: 145% 0; } }
+
+  .chat-typing { align-self: flex-start; display: inline-flex; align-items: center; gap: 4px; padding: 10px 14px; background: var(--paper); border: var(--bd2); }
+  .chat-typing span { width: 6px; height: 6px; border-radius: 50%; background: var(--ink-soft); animation: typingBounce 1.2s ease-in-out infinite; }
+  .chat-typing span:nth-child(2) { animation-delay: .15s; }
+  .chat-typing span:nth-child(3) { animation-delay: .3s; }
+  @keyframes typingBounce { 0%, 60%, 100% { transform: none; opacity: .45; } 30% { transform: translateY(-4px); opacity: 1; } }
+
+  /* ---- aksi pesan: muncul saat hover/focus, selalu tampil di layar sentuh ---- */
+  .chat-acts { display: flex; gap: 4px; margin-top: 6px; opacity: 0; transform: translateY(-2px); transition: opacity .16s var(--ease), transform .16s var(--ease-out); }
+  .chat-msg:hover .chat-acts, .chat-msg:focus-within .chat-acts { opacity: 1; transform: none; }
+  .chat-act { height: 25px; padding: 0 7px; display: inline-flex; align-items: center; gap: 4px; border: 1.5px solid var(--ink); background: var(--card); color: var(--ink); font-family: "Space Grotesk", sans-serif; font-size: 9px; font-weight: 700; letter-spacing: .06em; text-transform: uppercase; transition: background .15s, color .15s, transform .15s; }
+  .chat-act svg { width: 10px; height: 10px; }
+  .chat-act:hover { background: var(--yolk); color: var(--ink-fixed); }
+  .chat-act:active { transform: scale(.94); }
+  .chat-act.is-done { background: var(--green); color: var(--ink-fixed); border-color: var(--ink); }
+
+  .chat-jump { position: absolute; left: 50%; bottom: 10px; translate: -50% 0; z-index: 3; display: inline-flex; align-items: center; gap: 5px; padding: 6px 10px; background: var(--ink); color: var(--paper); border: 2px solid var(--ink); box-shadow: 3px 3px 0 var(--flame); font-family: "Space Grotesk", sans-serif; font-size: 10px; font-weight: 700; letter-spacing: .06em; text-transform: uppercase; animation: jumpIn .2s var(--ease-out); }
+  .chat-jump[hidden] { display: none; }
+  .chat-jump svg { width: 10px; height: 10px; }
+  @keyframes jumpIn { from { opacity: 0; transform: translateY(5px); } to { opacity: 1; transform: none; } }
+
+  .chat-quick { flex: none; display: flex; flex-wrap: wrap; gap: 6px; padding: 8px 12px; border-top: var(--bd2); background: var(--paper-2); }
+  .chat-chip { font-family: "Space Grotesk", sans-serif; font-weight: 700; font-size: 11px; letter-spacing: .03em; padding: 8px 10px; min-height: 36px; display: inline-flex; align-items: center; background: var(--paper); color: var(--ink); border: var(--bd2); cursor: pointer; white-space: nowrap; transition: background .15s, color .15s, transform .15s; }
+  .chat-chip:hover { background: var(--yolk); color: var(--ink-fixed); transform: translateY(-1px); }
+  .chat-widget.open .chat-chip { animation: chatChipIn .3s var(--ease-out) backwards; }
   .chat-widget.open .chat-chip:nth-child(2) { animation-delay: .04s; }
   .chat-widget.open .chat-chip:nth-child(3) { animation-delay: .08s; }
   .chat-widget.open .chat-chip:nth-child(4) { animation-delay: .12s; }
   @keyframes chatChipIn { from { opacity: 0; transform: translateY(6px); } to { opacity: 1; transform: none; } }
-  @media (max-height: 560px) { .chat-note { display: none; } }
+
+  .chat-form { flex: none; display: flex; align-items: flex-end; gap: 8px; padding: 10px 12px 8px; border-top: var(--bd2); background: var(--card); }
+  .chat-field { position: relative; flex: 1; min-width: 0; display: flex; }
+  .chat-input { width: 100%; min-height: 44px; max-height: 116px; padding: 11px 12px; resize: none; overflow-y: auto; font-family: "Epilogue", sans-serif; font-size: 13.5px; line-height: 1.45; color: var(--ink); background: var(--paper); border: var(--bd2); outline: none; transition: border-color .15s, box-shadow .15s; }
+  .chat-input::placeholder { color: var(--ink-soft); opacity: .75; }
+  .chat-input:focus { border-color: var(--flame); box-shadow: 0 0 0 3px rgba(255, 66, 28, .18); }
+  .chat-count { position: absolute; right: 7px; bottom: 4px; padding: 0 2px; background: var(--paper); font-family: "JetBrains Mono", monospace; font-size: 9px; color: var(--ink-soft); opacity: 0; pointer-events: none; transition: opacity .15s; }
+  .chat-field.has-count .chat-count { opacity: .85; }
+  .chat-send { width: 44px; height: 44px; flex: none; display: grid; place-items: center; background: var(--flame); color: var(--ink-fixed); border: var(--bd2); cursor: pointer; transition: transform .15s var(--ease-out), background .15s, opacity .15s; }
+  .chat-send svg { width: 16px; height: 16px; transition: transform .2s var(--ease-out); }
+  .chat-send:hover svg { transform: translateX(2px); }
+  .chat-send:hover { transform: scale(1.05) rotate(-4deg); }
+  .chat-send:active { transform: scale(.93); }
+  .chat-send:disabled { opacity: .4; cursor: not-allowed; transform: none; }
+  .chat-send .ic-stop { display: none; }
+  .chat-send.is-stop { background: var(--ink); color: var(--paper); }
+  .chat-send.is-stop .ic-send { display: none; }
+  .chat-send.is-stop .ic-stop { display: block; }
+  .chat-send.is-stop:hover { transform: scale(1.05); }
+
+  .chat-note { flex: none; padding: 0 12px 9px; background: var(--card); color: var(--ink-soft); font-family: "Space Grotesk", sans-serif; font-size: 9.5px; line-height: 1.4; letter-spacing: .01em; }
+  .chat-note a { color: var(--flame-deep); font-weight: 700; text-decoration: underline; text-underline-offset: 2px; }
+  html[data-theme="dark"] .chat-note a, html[data-preset] .chat-note a { color: var(--yolk); }
+
+  /* ---- mobile: pakai visual viewport biar composer nggak ketutup keyboard ---- */
+  @media (max-width: 560px) {
+    .chat-widget { right: 8px; left: 8px; bottom: max(8px, env(safe-area-inset-bottom)); width: auto; }
+    .chat-panel { height: calc(var(--chat-vvh, 100dvh) - 16px); box-shadow: 6px 6px 0 var(--flame); }
+    .chat-head { padding: 10px 10px 10px 12px; }
+    .chat-hbtn, .chat-close { width: 38px; height: 38px; }
+    .chat-body { padding: 12px; }
+    .chat-msg { max-width: 90%; font-size: 14px; }
+    .chat-think { max-width: 92%; }
+    .chat-input { font-size: 16px; }
+    .chat-quick { flex-wrap: nowrap; overflow-x: auto; scrollbar-width: none; }
+    .chat-quick::-webkit-scrollbar { display: none; }
+    .chat-chip { flex: none; min-height: 38px; }
+    body.chat-open { overflow: hidden; }
+  }
+  @media (max-height: 540px) and (min-width: 561px) {
+    .chat-panel { height: calc(100dvh - 24px); }
+    .chat-note { display: none; }
+  }
+  @media (hover: none) {
+    .chat-acts { opacity: 1; transform: none; }
+  }
+
+  /* saat chat kebuka, dock disembunyikan biar dua panel nggak tumpuk */
+  body.chat-open .dock { opacity: 0; visibility: hidden; pointer-events: none; transform: translateY(10px); }
+  body:not(.chat-open) .dock { transition: opacity .2s var(--ease), transform .2s var(--ease), visibility 0s 0s; }
+
   @media (prefers-reduced-motion: reduce) {
-    .chat-msg.is-streaming::after, .chat-widget.open .chat-chip { animation: none !important; }
+    .chat-widget, .chat-widget.open { transition-duration: .01ms; transform: none; }
+    .chat-msg, .chat-typing, .chat-think-steps li, .chat-widget.open .chat-chip, .chat-jump { animation: none !important; }
+    .chat-think-ico, .chat-think.is-live .chat-think-head::after, .chat-dot, .chat-typing span { animation: none !important; }
+    .chat-send:hover, .chat-send:active, .chat-close:hover { transform: none; }
+    .chat-body { scroll-behavior: auto; }
   }
 
   /* ================= ASCII MARK (tanda tangan ASCII besar) ================= */
@@ -1514,6 +1596,24 @@
     .nav-wa:hover { background: var(--flame-deep); box-shadow: 5px 5px 0 var(--sh-c); }
     .gl { cursor: grab; }
     .gl.dragging { cursor: grabbing; }
+  }
+
+  /* v15 micro: press feedback, fokus ring, dan origin dock */
+  .nav-links a { transition: background .15s var(--ease), color .15s var(--ease), border-color .15s var(--ease), transform .12s var(--ease); }
+  .dock-panel { transform-origin: 100% 100%; }
+  @media (prefers-reduced-motion: no-preference) {
+    .nav-links a:active { transform: translateY(1px) scale(.98); }
+    .to-top:active { transform: translate(2px, 2px); }
+    .dock-toggle:active { transform: scale(.92) rotate(-4deg); }
+    .faq-item summary:active { background: var(--paper-2); }
+    .foot-nav a:active { transform: translateY(1px); }
+    .chat-hbtn:active { transform: rotate(-14deg) scale(.94); }
+    .chat-jump:active { transform: translateY(1px) scale(.97); }
+  }
+  .nav-links a:focus-visible, .icon-btn:focus-visible, .dock-btn:focus-visible, .dock-toggle:focus-visible,
+  .chat-chip:focus-visible, .chat-hbtn:focus-visible, .chat-send:focus-visible, .chat-close:focus-visible,
+  .to-top:focus-visible, .foot-nav a:focus-visible, .faq-item summary:focus-visible {
+    outline: 2.5px solid var(--ikb); outline-offset: 3px;
   }
 
   /* v14 micro: press feedback di layar sentuh + state topbar sudah di atas */
@@ -1890,6 +1990,10 @@
       <button class="icon-btn" id="themeBtn" type="button" aria-label="Ganti tema" data-cursor data-label="TEMA">
         <svg class="ic-moon" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><path d="M17 12.5A7 7 0 0 1 7.5 3a7 7 0 1 0 9.5 9.5z"/></svg>
         <svg class="ic-sun" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><circle cx="10" cy="10" r="3.5"/><path d="M10 1.5v2M10 16.5v2M1.5 10h2M16.5 10h2M4 4l1.4 1.4M14.6 14.6 16 16M16 4l-1.4 1.4M5.4 14.6 4 16"/></svg>
+      </button>
+      <button class="icon-btn ai-btn" id="aiBtn" type="button" aria-label="Tanya Bagus AI" aria-expanded="false" aria-controls="chatWidget" data-cursor data-label="AI">
+        <svg viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linejoin="round" aria-hidden="true"><path d="M8.4 2.2l1.5 4.1 4.1 1.5-4.1 1.5-1.5 4.1-1.5-4.1L2.8 7.8l4.1-1.5z"/><path d="M15.4 12.2l.8 2.1 2.1.8-2.1.8-.8 2.1-.8-2.1-2.1-.8 2.1-.8z"/></svg>
+        <span class="ai-btn-dot" aria-hidden="true"></span>
       </button>
       <a class="nav-wa chip-btn" data-wa="nav" href="https://wa.me/62882003160605?text=Halo%20Bagus%2C%20aku%20mau%20tanya%20soal%20web!" target="_blank" rel="noopener" data-cursor data-label="CHAT">Chat WhatsApp</a>
       <button class="burger" id="burger" type="button" aria-label="Buka menu" aria-expanded="false" aria-controls="menu">
@@ -2616,6 +2720,7 @@
     <h3>Keyboard Shortcuts</h3>
     <p>Beberapa tombol rahasia buat kamu.</p>
     <div class="help-row"><span>Buka command palette</span><span><kbd>⌘</kbd>+<kbd>K</kbd></span></div>
+    <div class="help-row"><span>Tanya Bagus AI</span><span><kbd>⌘</kbd>+<kbd>/</kbd></span></div>
     <div class="help-row"><span>Tutup modal</span><span><kbd>ESC</kbd></span></div>
     <div class="help-row"><span>Buka help ini</span><span><kbd>?</kbd></span></div>
     <div class="help-row"><span>Party mode 🎉</span><span>ketik <kbd>konami</kbd></span></div>
@@ -4741,29 +4846,43 @@ try {
   <div class="chat-panel" role="dialog" aria-modal="true" aria-labelledby="chatTitle" aria-describedby="chatNote">
     <div class="chat-head">
       <div class="chat-avatar"><img src="assets/mascot.png" alt="" width="26" height="30" aria-hidden="true" /></div>
-      <div>
+      <div class="chat-id">
         <div class="chat-title" id="chatTitle">Bagus <span class="chat-ai">AI</span></div>
         <div class="chat-status" id="chatStatus"><span class="chat-dot" aria-hidden="true"></span><span id="chatStatusText">Online · biasanya balas cepat</span></div>
       </div>
-      <button class="chat-close" id="chatClose" type="button" aria-label="Tutup chat">
-        <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="2.2" aria-hidden="true"><path d="m3 3 10 10M13 3 3 13"/></svg>
+      <div class="chat-head-actions">
+        <button class="chat-hbtn" id="chatNew" type="button" aria-label="Mulai chat baru" title="Chat baru">
+          <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M13.5 8a5.5 5.5 0 1 1-1.7-4"/><path d="M13.5 2.4V5H11"/></svg>
+        </button>
+        <button class="chat-close" id="chatClose" type="button" aria-label="Tutup chat">
+          <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="2.2" aria-hidden="true"><path d="m3 3 10 10M13 3 3 13"/></svg>
+        </button>
+      </div>
+    </div>
+    <div class="chat-body-wrap">
+      <div class="chat-body" id="chatBody" role="log" aria-live="off" aria-relevant="additions" aria-busy="false" tabindex="0"></div>
+      <button class="chat-jump" id="chatJump" type="button" hidden>
+        <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M8 3v10M4 9l4 4 4-4"/></svg>
+        Pesan baru
       </button>
     </div>
-    <div class="chat-body" id="chatBody" role="log" aria-live="off"></div>
-    <div class="sr-only" id="chatLive" aria-live="polite"></div>
+    <div class="sr-only" id="chatLive" role="status" aria-live="polite"></div>
     <div class="chat-quick" id="chatQuick" aria-label="Pertanyaan cepat">
-      <button class="chat-chip" type="button" data-q="harga">Harga paket</button>
+      <button class="chat-chip" type="button" data-q="harga">Harga &amp; paket</button>
       <button class="chat-chip" type="button" data-q="layanan">Bisa bikin apa?</button>
       <button class="chat-chip" type="button" data-q="demo">Lihat demo</button>
-      <button class="chat-chip" type="button" data-q="wa">Chat WA</button>
+      <button class="chat-chip" type="button" data-q="wa">Ngobrol di WA</button>
     </div>
-    <div class="chat-input-row">
-      <input type="text" class="chat-input" id="chatInput" placeholder="Tulis pesan..." autocomplete="off" maxlength="500" aria-label="Tulis pesan untuk Bagus AI" />
-      <button class="chat-send" id="chatSend" type="button" aria-label="Kirim pesan">
+    <form class="chat-form" id="chatForm" novalidate>
+      <div class="chat-field" id="chatField">
+        <textarea class="chat-input" id="chatInput" rows="1" placeholder="Tanya apa aja…" autocomplete="off" maxlength="500" aria-label="Tulis pesan untuk Bagus AI"></textarea>
+        <span class="chat-count" id="chatCount" aria-hidden="true">0/500</span>
+      </div>
+      <button class="chat-send" id="chatSend" type="submit" aria-label="Kirim pesan">
         <svg class="ic-send" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M2 8h12M10 4l4 4-4 4"/></svg>
         <svg class="ic-stop" viewBox="0 0 16 16" aria-hidden="true"><rect x="4.5" y="4.5" width="7" height="7" rx="1" fill="currentColor"/></svg>
       </button>
-    </div>
+    </form>
     <p class="chat-note" id="chatNote">Asisten AI — bisa salah. Untuk deal &amp; detail, <a href="https://wa.me/62882003160605?text=Halo%20Bagus%2C%20aku%20dari%20website!" target="_blank" rel="noopener">chat WA</a>.</p>
   </div>
 </div>
@@ -4771,40 +4890,191 @@ try {
 <script>
 (function () {
   'use strict';
+
   var fab = document.getElementById('chatFab');
   var widget = document.getElementById('chatWidget');
   var closeBtn = document.getElementById('chatClose');
+  var newBtn = document.getElementById('chatNew');
   var body = document.getElementById('chatBody');
+  var jump = document.getElementById('chatJump');
   var live = document.getElementById('chatLive');
   var input = document.getElementById('chatInput');
+  var field = document.getElementById('chatField');
+  var count = document.getElementById('chatCount');
+  var form = document.getElementById('chatForm');
   var sendBtn = document.getElementById('chatSend');
   var quick = document.getElementById('chatQuick');
   var badge = document.getElementById('chatBadge');
   var statusEl = document.getElementById('chatStatus');
   var statusText = document.getElementById('chatStatusText');
   var heroAi = document.getElementById('heroAi');
+  var aiBtn = document.getElementById('aiBtn');
   if (!fab || !widget || !body) return;
 
-  var reduce = !!(window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches);
+  var REDUCE = !!(window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches);
+  var MOBILE = !!(window.matchMedia && window.matchMedia('(max-width: 560px)').matches);
+  var STORE = 'bdv-chat-v15';
+  var SEEN = 'bdv-chat-seen';
+  var MAX_HISTORY = 12;
+  var MAX_CTX_CHARS = 3200;
+  var WA = 'https://wa.me/62882003160605?text=Halo%20Bagus%2C%20aku%20dari%20website!';
+  var onlineLabel = 'Online · biasanya balas cepat';
+  var localLabel = 'Mode ringkas · jawaban dari data halaman';
+
+  /* endpoint: pakai window.BDV_CHAT_API kalau di-set, kalau tidak /api/chat
+     (same-origin). Di file:// atau GitHub Pages tanpa function, otomatis lokal. */
+  var API = (window.BDV_CHAT_API && String(window.BDV_CHAT_API).trim()) ||
+    (location.protocol === 'http:' || location.protocol === 'https:' ? '/api/chat' : '');
+
   var history = [];
   var streaming = false;
   var current = null;
-  var onlineLabel = 'Online · biasanya balas cepat';
+  var remoteOff = false;
+  var lastUser = '';
+  var lastBot = null;
+  var lastFocus = null;
+  var composing = false;
+  var raf = 0;
 
   var replies = {
-    harga: 'Paket: Kartu Nama Rp350rb (3–5 hari), Landing Pro Rp900rb (1–2 minggu), Full Service mulai Rp2jt-an (2–4 minggu). DP 50% mulai Rp175.000. Mau detail yang mana?',
-    layanan: 'Bisa landing page, web toko, company profile, kartu digital, playlist, plus video promo motion & logo. Semua responsif + tombol WA.',
-    demo: 'Ada di section Demo — video 20 detik 9:16 yang dirender live pakai HTML+canvas, bukan MP4. Scroll ke bagian "Demo" ya.',
-    wa: 'Langsung chat WA aja: wa.me/62882003160605 (balas 08.00–21.00 WIB).',
+    harga: 'Paketnya ada tiga:\n- **Kartu Nama** — Rp350rb, 3–5 hari\n- **Landing Pro** — Rp900rb, 1–2 minggu\n- **Full Service** — mulai Rp2jt, 2–4 minggu\n\nDP 50% di awal, mulai Rp175.000. Mau aku bantu pilih yang paling cocok?',
+    layanan: 'Bisa landing page, web toko, company profile, kartu digital, playlist, plus video promo motion & logo. Semua responsif, SEO dasar, dan ada tombol WA.',
+    demo: 'Ada di section **Demo** — reel 20 detik 9:16 yang dirender live pakai HTML + canvas, bukan MP4. Scroll ke bagian Demo ya.',
+    wa: 'Langsung chat WA aja: wa.me/62882003160605 — biasanya dibalas di bawah 1 jam (08.00–21.00 WIB).',
     proses: 'Alurnya: ngobrol → desain → bangun → launch. Konsultasi gratis, DP 50% kalau udah cocok.',
+    about: 'Aku **Bagus AI**, asisten di website ini — bukan Bagus sendiri. Aku bantu jawab soal layanan, harga, dan proses. Untuk deal, lanjut ke WA ya.',
     default: 'Boleh cerita lebih detail? Atau langsung chat WA: wa.me/62882003160605 🙌'
   };
+
+  var localSteps = {
+    harga: ['Mencocokkan kata kunci: harga', 'Mengambil fakta 3 paket + DP', 'Menyusun perbandingan singkat'],
+    layanan: ['Mencocokkan kata kunci: layanan', 'Mengambil daftar kemampuan', 'Menyusun jawaban'],
+    demo: ['Mencocokkan kata kunci: demo', 'Mengambil fakta reel 9:16', 'Mengarahkan ke section Demo'],
+    wa: ['Mencocokkan kata kunci: kontak', 'Mengambil nomor WA + jam balas', 'Menyusun jawaban'],
+    proses: ['Mencocokkan kata kunci: proses', 'Mengambil 4 tahap kerja', 'Menyusun jawaban'],
+    about: ['Mencocokkan kata kunci: identitas', 'Mengambil peran asisten', 'Menyusun jawaban'],
+    default: ['Membaca pertanyaan', 'Mencari fakta yang paling relevan', 'Menyusun jawaban']
+  };
+
+  /* ---------------- utils ---------------- */
+
+  function escapeHTML(s) {
+    return String(s).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
+  }
+
+  function fmt(text) {
+    var raw = String(text || '').replace(/\r/g, '').trim();
+    if (!raw) return '';
+    var s = escapeHTML(raw);
+    var codes = [];
+
+    s = s.replace(/`([^`\n]+)`/g, function (_, c) {
+      codes.push(c);
+      return '\u0000' + (codes.length - 1) + '\u0000';
+    });
+    s = s.replace(/(https?:\/\/[^\s<]+[^\s<.,;:!?)\]])/g, function (m) {
+      return '<a href="' + m + '" target="_blank" rel="noopener noreferrer">' + m + '</a>';
+    });
+    s = s.replace(/(^|[\s(])(wa\.me\/[^\s<]+)/g, function (_, p, m) {
+      return p + '<a href="https://' + m + '" target="_blank" rel="noopener noreferrer">' + m + '</a>';
+    });
+    s = s.replace(/\*\*([^*\n]+)\*\*/g, '<strong>$1</strong>');
+    s = s.replace(/(^|[\s(])\*([^*\n]+)\*/g, '$1<em>$2</em>');
+    s = s.replace(/\u0000(\d+)\u0000/g, function (_, i) { return '<code>' + codes[+i] + '</code>'; });
+
+    var lines = s.split('\n');
+    var out = [];
+    var list = null;
+    function closeList() { if (list) { out.push('</' + list + '>'); list = null; } }
+
+    for (var i = 0; i < lines.length; i++) {
+      var line = lines[i].trim();
+      if (!line) { closeList(); continue; }
+      var ul = line.match(/^[-*•]\s+(.*)$/);
+      var ol = line.match(/^\d+[.)]\s+(.*)$/);
+      if (ul) {
+        if (list !== 'ul') { closeList(); out.push('<ul>'); list = 'ul'; }
+        out.push('<li>' + ul[1] + '</li>');
+      } else if (ol) {
+        if (list !== 'ol') { closeList(); out.push('<ol>'); list = 'ol'; }
+        out.push('<li>' + ol[1] + '</li>');
+      } else {
+        closeList();
+        out.push('<p>' + line + '</p>');
+      }
+    }
+    closeList();
+    return out.join('');
+  }
+
+  function sleep(ms) { return new Promise(function (r) { setTimeout(r, ms); }); }
+
+  function fmtSec(ms) {
+    var s = ms / 1000;
+    if (s < 10) return s.toFixed(1).replace('.', ',') + 's';
+    return Math.round(s) + 's';
+  }
+
+  function keywordKey(text) {
+    var k = String(text || '').toLowerCase();
+    if (/harga|biaya|tarif|paket|berapa|mahal|budget|dp|bayar|rp/.test(k)) return 'harga';
+    if (/demo|video|motion|reel/.test(k)) return 'demo';
+    if (/portfolio|contoh|project|karya/.test(k)) return 'layanan';
+    if (/layanan|jasa|bikin|logo|desain|toko|landing|web/.test(k)) return 'layanan';
+    if (/wa|whatsapp|kontak|nomor|hubungi/.test(k)) return 'wa';
+    if (/revisi|durasi|lama|cepat|kapan|proses|mulai/.test(k)) return 'proses';
+    if (/manusia|ai|bot|kamu siapa|siapa kamu/.test(k)) return 'about';
+    return 'default';
+  }
+
+  function parseStream(raw) {
+    var s = String(raw || '');
+    var open = s.indexOf('<thought>');
+    var close = s.indexOf('</thought>');
+    var thought = '';
+    var answer = s;
+    if (open !== -1) {
+      if (close !== -1 && close > open) {
+        thought = s.slice(open + 9, close);
+        answer = s.slice(close + 10);
+      } else {
+        thought = s.slice(open + 9);
+        answer = '';
+      }
+    }
+    return { thought: thought.trim(), answer: answer.trim(), thinking: open !== -1 && close === -1 };
+  }
+
+  function thoughtSteps(t) {
+    var s = String(t || '').replace(/<[^>]*>/g, '').replace(/\r/g, '').trim();
+    if (!s) return [];
+    var parts = s.split(/\n+/).map(function (x) { return x.trim(); }).filter(Boolean);
+    if (parts.length === 1) {
+      var bits = parts[0].split(/\s*[-•]\s+/).map(function (x) { return x.trim(); }).filter(Boolean);
+      if (bits.length > 1) parts = bits;
+    }
+    return parts.map(function (x) {
+      return x.replace(/^[-*•\d.)\s]+/, '').replace(/\s+/g, ' ').trim();
+    }).filter(function (x) { return x.length > 2; }).slice(0, 5);
+  }
+
+  function pageContext() {
+    var secs = document.querySelectorAll('section[id]');
+    var mid = window.innerHeight * 0.42;
+    for (var i = 0; i < secs.length; i++) {
+      var r = secs[i].getBoundingClientRect();
+      if (r.top <= mid && r.bottom >= mid) return secs[i].id;
+    }
+    return '';
+  }
+
+  /* ---------------- status / busy ---------------- */
 
   function setStatus(mode, text) {
     if (!statusEl || !statusText) return;
     statusEl.classList.remove('is-busy', 'is-offline');
     if (mode === 'busy') statusEl.classList.add('is-busy');
-    if (mode === 'offline') statusEl.classList.add('is-offline');
+    if (mode === 'offline' || mode === 'local') statusEl.classList.add('is-offline');
     statusText.textContent = text;
   }
 
@@ -4812,60 +5082,203 @@ try {
     if (sendBtn) {
       sendBtn.classList.toggle('is-stop', on);
       sendBtn.setAttribute('aria-label', on ? 'Stop jawaban' : 'Kirim pesan');
+      sendBtn.disabled = !on && !(input && input.value.trim());
     }
-    if (input) {
-      input.setAttribute('aria-busy', on ? 'true' : 'false');
-      input.placeholder = on ? 'Tunggu jawaban selesai…' : 'Tulis pesan...';
-    }
+    if (input) input.setAttribute('aria-busy', on ? 'true' : 'false');
+    body.setAttribute('aria-busy', on ? 'true' : 'false');
   }
 
-  function escapeHTML(s) {
-    return String(s).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
+  function announce(text) {
+    if (!live) return;
+    var t = String(text || '').replace(/\s+/g, ' ').trim();
+    live.textContent = t.length > 320 ? t.slice(0, 317) + '…' : t;
   }
 
-  /* markdown-lite yang aman: escape dulu, cuma link wa.me yang dijadikan anchor */
-  function fmt(text) {
-    var s = escapeHTML(String(text || ''));
-    s = s.replace(/(^|\n)\s*[-*•]\s+/g, '$1• ');
-    s = s.replace(/`([^`\n]+)`/g, '<code>$1</code>');
-    s = s.replace(/\*\*([^*\n]+)\*\*/g, '<strong>$1</strong>');
-    s = s.replace(/(^|[\s(])\*([^*\n]+)\*/g, '$1<em>$2</em>');
-    s = s.replace(/(https?:\/\/)?wa\.me\/62882003160605/g, function (m) {
-      var href = m.indexOf('http') === 0 ? m : 'https://' + m;
-      return '<a href="' + href + '" target="_blank" rel="noopener noreferrer">' + m + '</a>';
+  /* ---------------- scroll ---------------- */
+
+  function nearBottom() {
+    return body.scrollHeight - body.scrollTop - body.clientHeight < 90;
+  }
+
+  function updateJump() {
+    if (!jump) return;
+    jump.hidden = nearBottom();
+  }
+
+  function scrollBottom(force) {
+    if (!force && !nearBottom()) { updateJump(); return; }
+    if (raf) return;
+    raf = requestAnimationFrame(function () {
+      raf = 0;
+      body.scrollTop = body.scrollHeight;
+      updateJump();
     });
-    return s.replace(/\n/g, '<br>');
   }
 
-  function nearBottom() { return body.scrollHeight - body.scrollTop - body.clientHeight < 72; }
-  function scrollBottom(force) { if (force || nearBottom()) body.scrollTop = body.scrollHeight; }
+  body.addEventListener('scroll', updateJump, { passive: true });
+  if (jump) jump.addEventListener('click', function () { scrollBottom(true); if (input) input.focus(); });
+
+  /* ---------------- thinking panel ---------------- */
+
+  function createThink() {
+    var el = document.createElement('div');
+    el.className = 'chat-think is-live';
+    el.setAttribute('data-open', 'true');
+    el.innerHTML =
+      '<button class="chat-think-head" type="button" aria-expanded="true">' +
+        '<svg class="chat-think-ico" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round" aria-hidden="true"><path d="M8 1.6l1.5 4.1 4.1 1.5-4.1 1.5L8 12.8 6.5 8.7 2.4 7.2l4.1-1.5z"/></svg>' +
+        '<span class="chat-think-label">Berpikir…</span>' +
+        '<span class="chat-think-time">0,0s</span>' +
+        '<svg class="chat-think-chev" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m4 6 4 4 4-4"/></svg>' +
+      '</button>' +
+      '<div class="chat-think-body"><div class="chat-think-inner"><ol class="chat-think-steps"></ol></div></div>';
+
+    var head = el.querySelector('.chat-think-head');
+    var label = el.querySelector('.chat-think-label');
+    var time = el.querySelector('.chat-think-time');
+    var list = el.querySelector('.chat-think-steps');
+    var api = {
+      el: el, steps: [], done: false, started: performance.now(), timer: 0,
+      setPending: function (text) {
+        if (api.steps.length) return;
+        list.innerHTML = '<li class="is-pending">' + escapeHTML(text) + '</li>';
+      },
+      sync: function (text) {
+        var next = thoughtSteps(text);
+        if (!next.length) return;
+        if (api.steps.length === 0) list.innerHTML = '';
+        for (var i = 0; i < next.length; i++) {
+          var li = list.children[i];
+          if (!li) {
+            li = document.createElement('li');
+            li.style.animationDelay = (REDUCE ? 0 : Math.min(i * 40, 160)) + 'ms';
+            list.appendChild(li);
+          }
+          if (li.textContent !== next[i]) li.textContent = next[i];
+        }
+        while (list.children.length > next.length) list.removeChild(list.lastChild);
+        api.steps = next;
+      },
+      start: function () {
+        api.timer = setInterval(function () {
+          time.textContent = fmtSec(performance.now() - api.started);
+        }, 100);
+      },
+      finish: function () {
+        if (api.done) return;
+        api.done = true;
+        clearInterval(api.timer);
+        el.classList.remove('is-live');
+        el.setAttribute('data-open', 'false');
+        head.setAttribute('aria-expanded', 'false');
+        label.textContent = 'Berpikir ' + fmtSec(performance.now() - api.started);
+        time.textContent = api.steps.length ? api.steps.length + ' langkah' : '';
+      },
+      remove: function () {
+        clearInterval(api.timer);
+        if (el.parentNode) el.parentNode.removeChild(el);
+      }
+    };
+
+    head.addEventListener('click', function () {
+      var open = el.getAttribute('data-open') === 'true';
+      el.setAttribute('data-open', open ? 'false' : 'true');
+      head.setAttribute('aria-expanded', open ? 'false' : 'true');
+    });
+
+    return api;
+  }
+
+  /* ---------------- messages ---------------- */
+
+  function copyText(t) {
+    if (navigator.clipboard && navigator.clipboard.writeText) {
+      return navigator.clipboard.writeText(t);
+    }
+    return new Promise(function (resolve, reject) {
+      var ta = document.createElement('textarea');
+      ta.value = t;
+      ta.style.position = 'fixed';
+      ta.style.opacity = '0';
+      document.body.appendChild(ta);
+      ta.select();
+      try { document.execCommand('copy'); resolve(); } catch (e) { reject(e); }
+      document.body.removeChild(ta);
+    });
+  }
+
+  function actBtn(label, icon, onClick) {
+    var b = document.createElement('button');
+    b.type = 'button';
+    b.className = 'chat-act';
+    b.innerHTML = icon + '<span>' + label + '</span>';
+    b.addEventListener('click', onClick);
+    return b;
+  }
+
+  var ICON_COPY = '<svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round" aria-hidden="true"><rect x="5" y="5" width="9" height="9"/><path d="M11 5V2H2v9h3"/></svg>';
+  var ICON_REDO = '<svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M13.5 8a5.5 5.5 0 1 1-1.7-4"/><path d="M13.5 2.4V5H11"/></svg>';
+
+  function addActs(node, raw, opts) {
+    opts = opts || {};
+    if (opts.actions === false) return;
+    var acts = document.createElement('div');
+    acts.className = 'chat-acts';
+
+    var copy = actBtn('Salin', ICON_COPY, function () {
+      copyText(raw).then(function () {
+        copy.classList.add('is-done');
+        var span = copy.querySelector('span');
+        var old = span.textContent;
+        span.textContent = 'Tersalin';
+        setTimeout(function () {
+          copy.classList.remove('is-done');
+          span.textContent = old;
+        }, 1400);
+      }).catch(function () {});
+    });
+    acts.appendChild(copy);
+
+    if (opts.regen) {
+      var regen = actBtn('Ulangi', ICON_REDO, function () {
+        if (streaming) return;
+        if (lastBot) {
+          if (lastBot.node && lastBot.node.parentNode) lastBot.node.parentNode.removeChild(lastBot.node);
+          if (lastBot.think && lastBot.think.parentNode) lastBot.think.parentNode.removeChild(lastBot.think);
+          lastBot = null;
+        }
+        if (history.length && history[history.length - 1].role === 'assistant') history.pop();
+        save();
+        aiReply(lastUser);
+      });
+      acts.appendChild(regen);
+    }
+
+    node.appendChild(acts);
+  }
 
   function addMsg(text, who, opts) {
     opts = opts || {};
     var d = document.createElement('div');
-    d.className = 'chat-msg ' + (who === 'user' ? 'user' : 'bot') + (opts.error ? ' chat-error' : '');
+    d.className = 'chat-msg ' + (who === 'user' ? 'user' : 'bot') +
+      (opts.error ? ' chat-error' : '') + (opts.note ? ' chat-note-msg' : '');
     if (who === 'user') d.textContent = text;
     else d.innerHTML = fmt(text);
+    d._raw = text;
     body.appendChild(d);
+    if (who !== 'user') addActs(d, text, opts);
     scrollBottom(true);
     return d;
   }
 
-  function removeNode(n) { if (n && n.parentNode) n.parentNode.removeChild(n); }
-  function announce(text) { if (live) live.textContent = String(text || ''); }
-
-  /* welcome */
-  addMsg('Hai! 👋 Aku Bagus AI — asisten di portfolio ini. Bisa bantu soal harga, layanan, proses, atau portfolio.', 'bot');
-  addMsg('Mau mulai dari mana? Pilih chip di bawah atau ketik pertanyaanmu langsung.', 'bot');
-
-  function showTyping() {
-    var t = document.createElement('div');
-    t.className = 'chat-typing';
-    t.setAttribute('aria-hidden', 'true');
-    t.innerHTML = '<span></span><span></span><span></span>';
-    body.appendChild(t);
-    scrollBottom(true);
-    return t;
+  function ensureBubble(c) {
+    if (c.bubble) return c.bubble;
+    var b = document.createElement('div');
+    b.className = 'chat-msg bot is-streaming';
+    body.appendChild(b);
+    c.bubble = b;
+    scrollBottom();
+    return b;
   }
 
   function paint(bubble, raw) {
@@ -4878,221 +5291,393 @@ try {
     });
   }
 
-  function finishStream(reply, alreadyRendered) {
-    reply = String(reply || '').trim();
-    if (current && current.bubble) {
-      current.bubble.classList.remove('is-streaming');
-      if (!alreadyRendered) {
-        if (current.bubble._raf) { cancelAnimationFrame(current.bubble._raf); current.bubble._raf = 0; }
-        current.bubble.innerHTML = fmt(reply);
-      }
-    }
-    if (reply) {
-      history.push({ role: 'assistant', content: reply });
-      announce(reply);
-    }
-    setStatus('online', onlineLabel);
-    setBusy(false);
-    streaming = false;
-    current = null;
+  function thoughtOf(c, p) {
+    return (p && p.thought) ? p.thought : (c.thinkRaw || '');
   }
 
-  function keywordKey(text) {
-    var k = String(text || '').toLowerCase();
-    if (/harga|biaya|tarif|paket|berapa|mahal|budget|dp|bayar/.test(k)) return 'harga';
-    if (/demo|video|motion|reel/.test(k)) return 'demo';
-    if (/portfolio|contoh|kerja|project|karya/.test(k)) return 'layanan';
-    if (/layanan|jasa|bikin|logo|desain/.test(k)) return 'layanan';
-    if (/wa|whatsapp|kontak|nomor|hubungi/.test(k)) return 'wa';
-    if (/revisi|durasi|lama|cepat|kapan|proses|mulai/.test(k)) return 'proses';
-    return 'default';
+  function applyStream(c, raw) {
+    var p = parseStream(raw);
+    var t = thoughtOf(c, p);
+    if (t && c.think) c.think.sync(t);
+    if (p.answer) {
+      var b = ensureBubble(c);
+      if (!b._raf && b.innerHTML === '' && !REDUCE) b.innerHTML = '';
+      paint(b, p.answer);
+      setStatus('busy', 'Menulis…');
+    } else if (t) {
+      setStatus('busy', 'Berpikir…');
+    }
   }
 
-  async function aiReply(text) {
-    history.push({ role: 'user', content: text });
-    if (history.length > 10) history = history.slice(-10);
+  function finalize(c, raw) {
+    var p = parseStream(raw);
+    var answer = p.answer;
+    if (!answer && p.thought) answer = p.thought;
+    if (!answer) answer = 'Aku belum bisa jawab itu. Coba tanya soal harga, layanan, atau proses ya.';
 
-    var ctrl = new AbortController();
-    current = { ctrl: ctrl, bubble: null, raw: '', aborted: false };
-    streaming = true;
-    setBusy(true);
-    setStatus('busy', 'Mengetik…');
-    var typing = showTyping();
-    var bubble = null;
-    var gotDelta = false;
+    var b = ensureBubble(c);
+    if (b._raf) { cancelAnimationFrame(b._raf); b._raf = 0; }
+    b.classList.remove('is-streaming');
+    b.innerHTML = fmt(answer);
+    b._raw = answer;
 
-    // ===== CLIENT-SIDE ONLY MODE (GitHub Pages compatible) =====
-    // No backend needed - uses local keyword responses with simulated streaming
-    // To enable remote AI: set window.BDV_CHAT_API = 'https://your-api.com/chat'
-    var apiUrl = (window.BDV_CHAT_API && String(window.BDV_CHAT_API).trim()) || null;
-    var useRemote = !!apiUrl;
+    if (c.think) {
+      if (c.think.steps.length) c.think.finish();
+      else c.think.remove();
+    }
 
-    if (!useRemote) {
-      // Simulate streaming with local keyword response
-      var localReply = replies[keywordKey(text)] || replies.default;
-      var words = localReply.split(' ');
-      var streamDelay = 35; // ms per word
+    addActs(b, answer, { regen: true });
+    history.push({ role: 'assistant', content: answer });
+    trimHistory();
+    save();
+    announce(answer);
+    setStatus(remoteOff || c.mode === 'local' ? 'local' : 'online', remoteOff || c.mode === 'local' ? localLabel : onlineLabel);
+    lastBot = { node: b, think: c.think && c.think.el };
+    scrollBottom();
+  }
 
-      removeNode(typing);
-      bubble = addMsg('', 'bot');
-      bubble.classList.add('is-streaming');
-      current.bubble = bubble;
-      current.raw = '';
-      setStatus('busy', 'Membalas…');
+  /* ---------------- history ---------------- */
 
-      for (var i = 0; i < words.length; i++) {
-        if (current.aborted) break;
-        current.raw += (i > 0 ? ' ' : '') + words[i];
-        paint(bubble, current.raw);
-        await new Promise(function (r) { setTimeout(r, streamDelay + Math.random() * 20); });
+  function trimHistory() {
+    var out = [];
+    var total = 0;
+    for (var i = history.length - 1; i >= 0; i--) {
+      var m = history[i];
+      if (!m || typeof m.content !== 'string') continue;
+      total += m.content.length;
+      if (total > MAX_CTX_CHARS && out.length >= 2) break;
+      out.unshift(m);
+      if (out.length >= MAX_HISTORY) break;
+    }
+    history = out;
+  }
+
+  function save() {
+    try { sessionStorage.setItem(STORE, JSON.stringify(history)); } catch (e) {}
+  }
+
+  function restore() {
+    try {
+      var arr = JSON.parse(sessionStorage.getItem(STORE) || '[]');
+      if (Array.isArray(arr)) {
+        history = arr.filter(function (m) {
+          return m && (m.role === 'user' || m.role === 'assistant') && typeof m.content === 'string';
+        }).slice(-MAX_HISTORY);
       }
+    } catch (e) { history = []; }
 
-      if (!current.aborted) {
-        finishStream(current.raw, false);
+    if (!history.length) { welcome(); return; }
+    var lastAssistant = history.length && history[history.length - 1].role === 'assistant';
+    for (var i = 0; i < history.length; i++) {
+      var m = history[i];
+      var node = addMsg(m.content, m.role === 'user' ? 'user' : 'bot', { actions: false });
+      if (m.role === 'user') lastUser = m.content;
+      else {
+        lastBot = { node: node, think: null };
+        addActs(node, m.content, { regen: lastAssistant && i === history.length - 1 });
+      }
+    }
+    setStatus(remoteOff ? 'local' : 'online', remoteOff ? localLabel : onlineLabel);
+  }
+
+  function welcome() {
+    addMsg('Hai! 👋 Aku **Bagus AI** — asisten di portfolio ini.\n\nBisa bantu soal **harga**, **layanan**, **proses**, atau **portfolio**. Mau mulai dari mana?', 'bot', { actions: false });
+  }
+
+  /* ---------------- local fallback ---------------- */
+
+  async function runLocal(text, c) {
+    var key = keywordKey(text);
+    var reply = replies[key] || replies.default;
+    var steps = localSteps[key] || localSteps.default;
+    c.mode = 'local';
+
+    if (c.think) c.think.setPending('Mencocokkan kata kunci…');
+    await sleep(180);
+    if (c.think) c.think.sync(steps.map(function (s) { return '- ' + s; }).join('\n'));
+
+    var tokens = reply.split(/(\s+)/);
+    var acc = '';
+    for (var i = 0; i < tokens.length; i++) {
+      if (c.aborted) break;
+      acc += tokens[i];
+      if (tokens[i].trim()) applyStream(c, acc);
+      await sleep(12 + Math.random() * 16);
+    }
+    if (c.aborted) {
+      if (acc.trim()) finalize(c, acc);
+      return;
+    }
+    finalize(c, acc);
+  }
+
+  /* ---------------- remote ---------------- */
+
+  async function runRemote(text, c) {
+    var res = await fetch(API, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ messages: history, page: pageContext() }),
+      signal: c.ctrl.signal
+    });
+
+    if (!res.ok) {
+      var detail = 'HTTP ' + res.status;
+      try {
+        var ej = await res.json();
+        if (ej && ej.error) detail = ej.error;
+        if (ej && ej.fallback) remoteOff = true;
+      } catch (e) {}
+      var err = new Error(detail);
+      err.status = res.status;
+      throw err;
+    }
+
+    var ctype = (res.headers.get('content-type') || '').toLowerCase();
+
+    if (ctype.indexOf('application/json') !== -1) {
+      var j = await res.json();
+      var plain = j && (j.reply || j.delta) ? String(j.reply || j.delta).trim() : '';
+      if (!plain) throw new Error('empty');
+      c.raw = plain;
+      applyStream(c, plain);
+      finalize(c, plain);
+      return;
+    }
+
+    if (!res.body || typeof res.body.getReader !== 'function') throw new Error('no-stream');
+
+    var reader = res.body.getReader();
+    var dec = new TextDecoder();
+    var buf = '';
+
+    while (true) {
+      var chunk = await reader.read();
+      if (chunk.done) break;
+      buf += dec.decode(chunk.value, { stream: true }).replace(/\r/g, '');
+      var blocks = buf.split('\n\n');
+      buf = blocks.pop() || '';
+
+      for (var i = 0; i < blocks.length; i++) {
+        var lines = blocks[i].split('\n');
+        for (var k = 0; k < lines.length; k++) {
+          var line = lines[k];
+          if (line.indexOf('data:') !== 0) continue;
+          var data = line.slice(5).trim();
+          if (!data || data === '[DONE]') continue;
+
+          var obj;
+          try { obj = JSON.parse(data); } catch (e) { continue; }
+
+          if (obj && obj.error) {
+            var se = new Error(obj.error);
+            se.friendly = true;
+            throw se;
+          }
+          if (obj && typeof obj.think === 'string' && obj.think) {
+            c.thinkRaw = (c.thinkRaw || '') + obj.think;
+            if (c.think) c.think.sync(c.thinkRaw);
+          }
+          if (obj && typeof obj.delta === 'string' && obj.delta) {
+            c.raw += obj.delta;
+            applyStream(c, c.raw);
+          }
+        }
+      }
+    }
+
+    if (!c.raw.trim() && !(c.thinkRaw || '').trim()) throw new Error('empty');
+    finalize(c, c.raw);
+  }
+
+  /* ---------------- error handling ---------------- */
+
+  async function fallbackLocal(c) {
+    remoteOff = true;
+    setStatus('local', localLabel);
+    if (c.think) c.think.remove();
+    c.think = createThink();
+    body.appendChild(c.think.el);
+    c.think.start();
+    await runLocal(lastUser, c);
+  }
+
+  async function handleError(e, c) {
+    if (current !== c) return;
+    var aborted = c.aborted || (e && e.name === 'AbortError');
+
+    if (aborted) {
+      if (c.raw.trim()) {
+        finalize(c, c.raw);
+      } else {
+        if (c.think) c.think.remove();
+        if (c.bubble && c.bubble.parentNode) c.bubble.parentNode.removeChild(c.bubble);
+        addMsg('Oke, aku stop. Mau tanya yang lain?', 'bot', { actions: false });
+        setStatus(remoteOff ? 'local' : 'online', remoteOff ? localLabel : onlineLabel);
       }
       return;
     }
 
-    // ===== REMOTE API MODE (for Vercel/Netlify/etc) =====
-    try {
-      var res = await fetch(apiUrl, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ messages: history }),
-        signal: ctrl.signal
-      });
-
-      if (!res.ok) {
-        var detail = 'HTTP ' + res.status;
-        try { var ej = await res.json(); if (ej && ej.error) detail = ej.error; } catch (e) {}
-        var err = new Error(detail);
-        err.status = res.status;
-        throw err;
-      }
-
-      var ctype = (res.headers.get('content-type') || '').toLowerCase();
-
-      /* server lama / proxy yang buffer: balasan JSON biasa */
-      if (ctype.indexOf('application/json') !== -1) {
-        var j = await res.json();
-        var plain = j && j.reply ? String(j.reply).trim() : '';
-        if (!plain) throw new Error('empty');
-        removeNode(typing);
-        bubble = addMsg(plain, 'bot');
-        current.bubble = bubble;
-        current.raw = plain;
-        finishStream(plain, true);
-        return;
-      }
-
-      if (!res.body || typeof res.body.getReader !== 'function') throw new Error('no-stream');
-
-      var reader = res.body.getReader();
-      var dec = new TextDecoder();
-      var buf = '';
-
-      while (true) {
-        var chunk = await reader.read();
-        if (chunk.done) break;
-        buf += dec.decode(chunk.value, { stream: true }).replace(/\r/g, '');
-        var blocks = buf.split('\n\n');
-        buf = blocks.pop() || '';
-
-        for (var i = 0; i < blocks.length; i++) {
-          var lines = blocks[i].split('\n');
-          for (var j = 0; j < lines.length; j++) {
-            var line = lines[j];
-            if (line.indexOf('data:') !== 0) continue;
-            var data = line.slice(5).trim();
-            if (!data || data === '[DONE]') continue;
-
-            var obj;
-            try { obj = JSON.parse(data); } catch (e) { continue; }
-            if (obj && obj.error) {
-              var streamErr = new Error(obj.error);
-              streamErr.friendly = true;
-              throw streamErr;
-            }
-            if (obj && typeof obj.delta === 'string' && obj.delta) {
-              if (!gotDelta) {
-                gotDelta = true;
-                removeNode(typing);
-                bubble = addMsg('', 'bot');
-                bubble.classList.add('is-streaming');
-                current.bubble = bubble;
-                setStatus('busy', 'Membalas…');
-              }
-              current.raw += obj.delta;
-              paint(bubble, current.raw);
-            }
-          }
-        }
-      }
-
-      if (!gotDelta) throw new Error('empty');
-      finishStream(current.raw, false);
-    } catch (e) {
-      var wasAborted = current && current.aborted;
-      removeNode(typing);
-      if (bubble) {
-        if (bubble._raf) { cancelAnimationFrame(bubble._raf); bubble._raf = 0; }
-        bubble.classList.remove('is-streaming');
-      }
-
-      if (wasAborted) {
-        var partial = current.raw.trim();
-        if (partial) {
-          bubble.innerHTML = fmt(partial);
-          history.push({ role: 'assistant', content: partial });
-          announce(partial);
-          setStatus('online', onlineLabel);
-        } else {
-          removeNode(bubble);
-          addMsg('Oke, dibatalin. Mau tanya yang lain?', 'bot');
-        }
-        setBusy(false);
-        streaming = false;
-        current = null;
-        return;
-      }
-
-      if (current && current.raw.trim()) {
-        history.push({ role: 'assistant', content: current.raw.trim() });
-        setStatus('offline', 'Koneksi kepotong · jawaban lokal');
-        setBusy(false);
-        streaming = false;
-        current = null;
-        return;
-      }
-
-      removeNode(bubble);
-
-      // FIX: Use the `text` parameter (was out of scope in catch block)
-      var local = replies[keywordKey(text)] || replies.default;
-      if (e && e.status === 429) {
-        addMsg('Sabar ya, lagi rame 🙏 Coba lagi 2–3 menit, atau langsung WA: wa.me/62882003160605', 'bot', { error: true });
-        setStatus('online', onlineLabel);
-      } else {
-        addMsg(local, 'bot');
-        history.push({ role: 'assistant', content: local });
-        announce(local);
-        setStatus('offline', 'Mode ringkas · AI sedang offline');
-      }
-      setBusy(false);
-      streaming = false;
-      current = null;
+    if (e && (e.status === 503 || e.status === 404)) { await fallbackLocal(c); return; }
+    if (e && e.status === 429) {
+      if (c.think) c.think.remove();
+      if (c.bubble && c.bubble.parentNode) c.bubble.parentNode.removeChild(c.bubble);
+      addMsg('Sabar ya, lagi rame 🙏 Coba lagi 2–3 menit, atau langsung WA: wa.me/62882003160605', 'bot', { error: true });
+      setStatus('online', onlineLabel);
+      return;
     }
+
+    if (c.raw.trim()) {
+      finalize(c, c.raw);
+      setStatus('offline', 'Koneksi kepotong · jawaban sebagian');
+      return;
+    }
+
+    if (c.think) c.think.remove();
+    if (c.bubble && c.bubble.parentNode) c.bubble.parentNode.removeChild(c.bubble);
+
+    var errNode = addMsg('Koneksi ke AI kepotong. Coba lagi ya, atau langsung WA.', 'bot', { error: true, actions: false });
+    var acts = document.createElement('div');
+    acts.className = 'chat-acts';
+    acts.appendChild(actBtn('Coba lagi', ICON_REDO, function () {
+      if (streaming) return;
+      if (errNode.parentNode) errNode.parentNode.removeChild(errNode);
+      aiReply(lastUser);
+    }));
+    errNode.appendChild(acts);
+    setStatus('offline', 'Koneksi keputusan · coba lagi');
+  }
+
+  /* ---------------- main send ---------------- */
+
+  async function aiReply(text) {
+    text = String(text || '').trim();
+    if (!text || streaming) return;
+
+    lastUser = text;
+    history.push({ role: 'user', content: text });
+    trimHistory();
+    save();
+
+    var c = {
+      ctrl: new AbortController(),
+      bubble: null, think: null, raw: '', thinkRaw: '',
+      aborted: false, mode: remoteOff || !API ? 'local' : 'remote',
+      started: performance.now()
+    };
+    current = c;
+    streaming = true;
+    setBusy(true);
+    setStatus('busy', 'Berpikir…');
+    body.setAttribute('aria-busy', 'true');
+
+    c.think = createThink();
+    body.appendChild(c.think.el);
+    c.think.start();
+    c.think.setPending(c.mode === 'remote' ? 'Membaca pertanyaan…' : 'Mencocokkan kata kunci…');
+    scrollBottom(true);
+
+    try {
+      if (c.mode === 'remote') await runRemote(text, c);
+      else await runLocal(text, c);
+    } catch (e) {
+      await handleError(e, c);
+    } finally {
+      if (current === c) {
+        if (c.think && !c.think.done && c.think.el.parentNode) {
+          if (c.think.steps.length) c.think.finish();
+          else c.think.remove();
+        }
+        streaming = false;
+        setBusy(false);
+        body.setAttribute('aria-busy', 'false');
+        current = null;
+      }
+    }
+  }
+
+  function stop() {
+    if (!current) return;
+    current.aborted = true;
+    try { current.ctrl.abort(); } catch (e) {}
+    setStatus('busy', 'Berhenti…');
   }
 
   function sendUser(text) {
     text = String(text || '').trim();
     if (!text || streaming) return;
     addMsg(text, 'user');
-    input.value = '';
+    if (input) {
+      input.value = '';
+      autoGrow();
+    }
     aiReply(text);
   }
 
-  var lastFocus = null;
+  /* ---------------- composer ---------------- */
+
+  function autoGrow() {
+    if (!input) return;
+    input.style.height = 'auto';
+    var h = Math.min(input.scrollHeight, 116);
+    input.style.height = h + 'px';
+
+    var len = input.value.length;
+    if (field) field.classList.toggle('has-count', len > 380);
+    if (count) count.textContent = len + '/500';
+    if (sendBtn) sendBtn.disabled = !streaming && !input.value.trim();
+  }
+
+  if (input) {
+    input.addEventListener('input', autoGrow);
+    input.addEventListener('compositionstart', function () { composing = true; });
+    input.addEventListener('compositionend', function () { composing = false; });
+    input.addEventListener('keydown', function (e) {
+      if (e.key === 'Enter' && !e.shiftKey) {
+        if (composing || e.isComposing) return;
+        e.preventDefault();
+        if (!streaming) sendUser(input.value);
+      }
+    });
+  }
+
+  if (form) {
+    form.addEventListener('submit', function (e) {
+      e.preventDefault();
+      if (streaming) return;
+      sendUser(input.value);
+    });
+  }
+
+  if (sendBtn) {
+    sendBtn.addEventListener('click', function (e) {
+      if (streaming) {
+        e.preventDefault();
+        stop();
+      }
+    });
+  }
+
+  /* ---------------- quick chips ---------------- */
+
+  if (quick) {
+    quick.addEventListener('click', function (e) {
+      var btn = e.target.closest ? e.target.closest('.chat-chip') : null;
+      if (!btn || streaming) return;
+      var label = btn.textContent.trim();
+      addMsg(label, 'user');
+      aiReply(label);
+    });
+  }
+
+  /* ---------------- open / close ---------------- */
+
+  function markSeen() {
+    try { sessionStorage.setItem(SEEN, '1'); } catch (e) {}
+    if (badge) badge.style.display = 'none';
+    if (aiBtn) aiBtn.classList.add('is-seen');
+  }
+
   function open() {
     lastFocus = document.activeElement;
     var dockEl = document.getElementById('dock');
@@ -5100,26 +5685,68 @@ try {
     if (dockEl) dockEl.classList.remove('open');
     document.body.classList.remove('dock-open');
     if (dockToggleEl) dockToggleEl.setAttribute('aria-expanded', 'false');
+
     document.body.classList.add('chat-open');
     widget.inert = false;
     widget.classList.add('open');
     widget.setAttribute('aria-hidden', 'false');
-    fab.setAttribute('aria-expanded', 'true');
-    fab.setAttribute('aria-label', 'Tutup chat');
-    if (badge) badge.style.display = 'none';
+    if (fab) fab.setAttribute('aria-expanded', 'true');
+    if (aiBtn) aiBtn.setAttribute('aria-expanded', 'true');
+    markSeen();
     scrollBottom(true);
-    setTimeout(function () { input && input.focus(); }, 200);
+
+    if (!MOBILE) setTimeout(function () { if (input) input.focus(); }, REDUCE ? 0 : 220);
   }
+
   function close() {
+    var focusTarget = (lastFocus && lastFocus.offsetParent) ? lastFocus : (aiBtn || document.getElementById('dockToggle'));
+    if (focusTarget && typeof focusTarget.focus === 'function') { try { focusTarget.focus(); } catch (e) {} }
     widget.classList.remove('open');
     widget.setAttribute('aria-hidden', 'true');
-    widget.inert = true;
     document.body.classList.remove('chat-open');
-    var focusTarget = (lastFocus && lastFocus.offsetParent) ? lastFocus : document.getElementById('dockToggle');
-    if (focusTarget && typeof focusTarget.focus === 'function') { try { focusTarget.focus(); } catch (e) {} }
-    fab.setAttribute('aria-expanded', 'false');
-    fab.setAttribute('aria-label', 'Buka chat');
+    if (fab) fab.setAttribute('aria-expanded', 'false');
+    if (aiBtn) aiBtn.setAttribute('aria-expanded', 'false');
+    setTimeout(function () { if (!widget.classList.contains('open')) widget.inert = true; }, REDUCE ? 0 : 190);
   }
+
+  function newChat() {
+    if (current) {
+      current.aborted = true;
+      try { current.ctrl.abort(); } catch (e) {}
+      current = null;
+    }
+    streaming = false;
+    setBusy(false);
+    body.setAttribute('aria-busy', 'false');
+    body.innerHTML = '';
+    history = [];
+    lastUser = '';
+    lastBot = null;
+    remoteOff = false;
+    try { sessionStorage.removeItem(STORE); } catch (e) {}
+    if (newBtn) {
+      newBtn.classList.remove('is-spin');
+      void newBtn.offsetWidth;
+      newBtn.classList.add('is-spin');
+    }
+    welcome();
+    setStatus(API ? 'online' : 'local', API ? onlineLabel : localLabel);
+    if (input) { input.value = ''; autoGrow(); if (!MOBILE) input.focus(); }
+  }
+
+  if (newBtn) newBtn.addEventListener('click', newChat);
+  if (closeBtn) closeBtn.addEventListener('click', close);
+  if (fab) fab.addEventListener('click', function () {
+    var rip = document.createElement('span');
+    rip.className = 'rip';
+    fab.appendChild(rip);
+    setTimeout(function () { if (rip.parentNode) rip.parentNode.removeChild(rip); }, 620);
+    widget.classList.contains('open') ? close() : open();
+  });
+  if (heroAi) heroAi.addEventListener('click', open);
+  if (aiBtn) aiBtn.addEventListener('click', function () {
+    widget.classList.contains('open') ? close() : open();
+  });
 
   document.addEventListener('bdv:dock', function (e) {
     if (e.detail && e.detail.open && widget.classList.contains('open')) close();
@@ -5127,82 +5754,75 @@ try {
 
   widget.addEventListener('keydown', function (e) {
     if (e.key !== 'Tab' || !widget.classList.contains('open')) return;
-    var focusables = widget.querySelectorAll('button, [href], input, select, textarea, [tabindex]:not([tabindex="-1"])');
+    var focusables = widget.querySelectorAll('button:not([disabled]), [href], input, textarea, [tabindex]:not([tabindex="-1"])');
     if (!focusables.length) return;
     var first = focusables[0], last = focusables[focusables.length - 1];
     if (e.shiftKey && document.activeElement === first) { e.preventDefault(); last.focus(); }
     else if (!e.shiftKey && document.activeElement === last) { e.preventDefault(); first.focus(); }
   });
 
-  fab.addEventListener('click', function () {
-    var rip = document.createElement('span');
-    rip.className = 'rip';
-    fab.appendChild(rip);
-    setTimeout(function () { removeNode(rip); }, 620);
-    widget.classList.contains('open') ? close() : open();
-  });
-  closeBtn && closeBtn.addEventListener('click', close);
-
-  sendBtn && sendBtn.addEventListener('click', function () {
-    if (streaming) {
-      if (current) {
-        current.aborted = true;
-        current.ctrl.abort();
-      }
+  document.addEventListener('keydown', function (e) {
+    var k = (e.key || '').toLowerCase();
+    if ((e.metaKey || e.ctrlKey) && k === '/') {
+      e.preventDefault();
+      widget.classList.contains('open') ? close() : open();
       return;
     }
-    sendUser(input.value);
+    if (e.key === 'Escape' && widget.classList.contains('open')) close();
   });
-
-  input && input.addEventListener('keydown', function (e) {
-    if (e.key === 'Enter') {
-      e.preventDefault();
-      if (!streaming) sendUser(input.value);
-    }
-  });
-
-  document.addEventListener('keydown', function (e) { if (e.key === 'Escape' && widget.classList.contains('open')) close(); });
-
-  if (quick) {
-    quick.addEventListener('click', function (e) {
-      var btn = e.target.closest ? e.target.closest('.chat-chip') : null;
-      if (!btn || streaming) return;
-      var q = btn.getAttribute('data-q');
-      var label = btn.textContent.trim();
-      addMsg(label, 'user');
-      if (q === 'wa') {
-        var txt = replies.wa;
-        addMsg(txt, 'bot');
-        history.push({ role: 'assistant', content: txt });
-        announce(txt);
-        return;
-      }
-      aiReply(label);
-    });
-  }
-
-  if (heroAi) heroAi.addEventListener('click', open);
-
-  window.bdvChat = {
-    open: open,
-    close: close,
-    ask: function (q) {
-      open();
-      var t = String(q || '').trim();
-      if (t) setTimeout(function () { sendUser(t); }, 260);
-    }
-  };
 
   document.addEventListener('click', function (e) {
     if (!widget.classList.contains('open')) return;
     var cmdk = document.getElementById('cmdk');
-    if (widget.contains(e.target) || fab.contains(e.target)) return;
+    if (widget.contains(e.target) || (fab && fab.contains(e.target))) return;
+    if (aiBtn && aiBtn.contains(e.target)) return;
     if (heroAi && heroAi.contains(e.target)) return;
     if (cmdk && cmdk.contains(e.target)) return;
     close();
   });
+
+  window.addEventListener('offline', function () { setStatus('offline', 'Kamu sedang offline'); });
+  window.addEventListener('online', function () {
+    setStatus(remoteOff ? 'local' : 'online', remoteOff ? localLabel : onlineLabel);
+  });
+
+  /* visual viewport: di HP, tinggi panel ikut keyboard */
+  if (window.visualViewport) {
+    var vv = window.visualViewport;
+    var syncVV = function () {
+      document.documentElement.style.setProperty('--chat-vvh', vv.height + 'px');
+    };
+    syncVV();
+    vv.addEventListener('resize', syncVV);
+    vv.addEventListener('scroll', syncVV);
+  }
+
+  window.bdvChat = {
+    open: open,
+    close: close,
+    reset: newChat,
+    ask: function (q) {
+      open();
+      var t = String(q || '').trim();
+      if (t) setTimeout(function () { sendUser(t); }, 280);
+    }
+  };
+
+  /* ---------------- boot ---------------- */
+
+  try {
+    if (sessionStorage.getItem(SEEN)) {
+      if (badge) badge.style.display = 'none';
+      if (aiBtn) aiBtn.classList.add('is-seen');
+    }
+  } catch (e) {}
+
+  restore();
+  setStatus(API ? 'online' : 'local', API ? onlineLabel : localLabel);
+  autoGrow();
 })();
 </script>
+
 
 <script>
 /* v14: kartu hero melayang halus saat scroll */
