@@ -138,7 +138,7 @@ export default async function handler(req, res) {
         body: JSON.stringify({
           model: MODEL,
           messages: [{ role: 'system', content: SYSTEM_PROMPT }, ...messages],
-          max_tokens: 320,
+          max_tokens: 650,
           temperature: 0.5,
           top_p: 0.9,
           stream: true
