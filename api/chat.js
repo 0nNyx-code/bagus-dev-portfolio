@@ -21,8 +21,8 @@ const NVIDIA_URL = 'https://integrate.api.nvidia.com/v1/chat/completions';
 const MODEL = 'nvidia/nemotron-3.5-lightning-30b-a3b';
 const FALLBACK_MODELS = ['meta/llama-3.2-11b-vision-instruct'].filter((m) => m !== MODEL);
 
-const MAX_TOKENS = 480;
-const MAX_CHARS = 4000;
+const MAX_TOKENS = 9480;
+const MAX_CHARS = 40000;
 
 const SYSTEM_PROMPT = [
   'Kamu adalah "Bagus AI", asisten di website portfolio bagus-dev.',
@@ -79,7 +79,7 @@ const hits = new Map();
 function limited(ip) {
   const now = Date.now();
   const win = 3 * 60 * 1000;
-  const max = 20;
+  const max = 90;
   const arr = (hits.get(ip) || []).filter((t) => now - t < win);
   arr.push(now);
   hits.set(ip, arr);
