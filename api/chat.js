@@ -78,12 +78,12 @@ const SYSTEM_PROMPT = [
 const hits = new Map();
 function limited(ip) {
   const now = Date.now();
-  const win = 3 * 60 * 1000;
+  const win = 60 * 120 * 2000;
   const max = 90;
   const arr = (hits.get(ip) || []).filter((t) => now - t < win);
   arr.push(now);
   hits.set(ip, arr);
-  if (hits.size > 500) hits.clear();
+  if (hits.size > 1000) hits.clear();
   return arr.length > max;
 }
 
@@ -137,9 +137,9 @@ async function callModel(model, messages, signal) {
       model,
       messages,
       max_tokens: MAX_TOKENS,
-      temperature: 0.55,
-      top_p: 0.9,
-      frequency_penalty: 0.15,
+      temperature: 0.99,
+      top_p: 0.25,
+      frequency_penalty: 0.55,
       stream: true
     })
   });
