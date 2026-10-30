@@ -2,7 +2,7 @@
 <html lang="id">
 <head>
 <meta charset="UTF-8" />
-<meta name="viewport" content="width=device-width, initial-scale=1" />
+<meta name="viewport" content="width=device-width, initial-scale=1, interactive-widget=resizes-content" />
 <meta name="color-scheme" content="only light" />
 <title>Web Designer Jogja & Jasa Bikin Website UMKM — bagus-dev</title>
 <meta name="description" content="Bagus — web designer & developer dari Bantul, Jogja. Bikin landing page, web toko, dan profil usaha yang enak dipandang & enak dipakai. Mulai Rp350rb, ramah UMKM." />
@@ -26,28 +26,6 @@
 <link rel="preconnect" href="https://fonts.googleapis.com" />
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
 <link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,400..800&family=Space+Grotesk:wght@400..700&family=Epilogue:ital,wght@0,400..700;1,400&family=Instrument+Serif:ital@1&family=JetBrains+Mono:wght@400..700&display=swap" rel="stylesheet" />
-<!-- Tailwind (play CDN) — utility layer for UI polish; tokens mapped below -->
-<script src="https://cdn.tailwindcss.com"></script>
-<script>
-  tailwind.config = {
-    corePlugins: { preflight: false },
-    theme: {
-      extend: {
-        colors: {
-          paper: 'var(--paper)', 'paper-2': 'var(--paper-2)',
-          ink: 'var(--ink)', 'ink-soft': 'var(--ink-soft)',
-          card: 'var(--card)', cream: 'var(--cream)',
-          flame: 'var(--flame)', yolk: 'var(--yolk)', ikb: 'var(--ikb)'
-        },
-        fontFamily: {
-          display: ['"Bricolage Grotesque"', 'sans-serif'],
-          sans: ['"Space Grotesk"', 'sans-serif'],
-          mono: ['"JetBrains Mono"', 'monospace']
-        }
-      }
-    }
-  }
-</script>
 <script>
   (function () {
     try {
@@ -1338,6 +1316,21 @@
   .chat-act:active { transform: scale(.94); }
   .chat-act.is-done { background: var(--green); color: var(--ink-fixed); border-color: var(--ink); }
 
+  /* ---- saran lanjutan setelah jawaban terakhir ---- */
+  .chat-next { display: flex; flex-wrap: wrap; gap: 4px; margin-top: 7px; }
+  .chat-next-btn {
+    font-family: "Space Grotesk", sans-serif; font-weight: 700; font-size: 10px; letter-spacing: .03em;
+    padding: 5px 8px; min-height: 27px; display: inline-flex; align-items: center;
+    background: var(--paper-2); color: var(--ink); cursor: pointer; white-space: nowrap;
+    border: 1.5px solid color-mix(in srgb, var(--ink) 32%, transparent);
+    transition: background .15s, color .15s, border-color .15s, transform .15s;
+    animation: chatChipIn .24s var(--ease-out) both;
+  }
+  .chat-next-btn:nth-child(2) { animation-delay: .03s; }
+  .chat-next-btn:nth-child(3) { animation-delay: .06s; }
+  .chat-next-btn:hover { background: var(--flame); color: var(--ink-fixed); border-color: var(--ink); transform: translateY(-1px); }
+  .chat-next-btn:active { transform: scale(.96); }
+
   .chat-jump { position: absolute; left: 50%; bottom: 10px; translate: -50% 0; z-index: 3; display: inline-flex; align-items: center; gap: 5px; padding: 6px 10px; background: var(--ink); color: var(--paper); border: 2px solid var(--ink); box-shadow: 3px 3px 0 var(--flame); font-family: "Space Grotesk", sans-serif; font-size: 10px; font-weight: 700; letter-spacing: .06em; text-transform: uppercase; animation: jumpIn .2s var(--ease-out); }
   .chat-jump[hidden] { display: none; }
   .chat-jump svg { width: 10px; height: 10px; }
@@ -1472,14 +1465,20 @@
     background: repeating-linear-gradient(0deg, rgba(0, 0, 0, .46) 0 1px, transparent 1px 3px);
     opacity: .45;
   }
-  /* sapuan sinar */
+  /* sapuan sinar — animasi `transform` (compositor) biar nggak repaint tiap frame.
+     translateY % dihitung dari tinggi pseudo (38% container) supaya posisi
+     visualnya persis sama dengan `top:-40% → 106%` versi lama. */
   .am-frame::before {
-    content: ""; position: absolute; left: 0; right: 0; top: -40%; height: 38%; z-index: 4;
+    content: ""; position: absolute; left: 0; right: 0; top: 0; height: 38%; z-index: 4;
     pointer-events: none;
     background: linear-gradient(180deg, transparent, color-mix(in srgb, var(--flame) 13%, transparent), transparent);
+    will-change: transform;
     animation: amSweep 8s cubic-bezier(.42, 0, .2, 1) infinite;
   }
-  @keyframes amSweep { 0% { top: -40%; } 58%, 100% { top: 106%; } }
+  @keyframes amSweep {
+    0% { transform: translate3d(0, -105.263%, 0); }
+    58%, 100% { transform: translate3d(0, 278.947%, 0); }
+  }
   .am-corner {
     position: absolute; width: 12px; height: 12px; z-index: 5; pointer-events: none;
     border: 2px solid var(--flame); opacity: .8;
@@ -1498,6 +1497,11 @@
     color: var(--flame);
     text-shadow: 0 0 12px rgba(255, 66, 28, .3), 0 0 36px rgba(255, 66, 28, .13);
   }
+  /* 50 baris × 3 varian ditumpuk di sel grid yang sama.
+     Ganti frame = toggle `visibility` → nol re-shape teks, nol relayout. */
+  .am-art .am-line { display: grid; }
+  .am-art .am-v { grid-area: 1 / 1; white-space: pre; visibility: hidden; }
+  .am-art .am-v.on { visibility: visible; }
   .ascii-mark.is-live .am-art {
     animation:
       amPrint 1.15s steps(26, end) both,
@@ -1583,6 +1587,109 @@
     mix-blend-mode: overlay;
   }
   .chat-panel { position: relative; overflow: hidden; }
+
+  /* ================= PAPAN KETIK CEPAT (mobile) =================
+     Keyboard dalam app: nggak perlu naik-turunin keyboard Android cuma
+     buat nanya singkat. Dua mode: kalimat siap-kirim + QWERTY ringkas. */
+  .chat-kb { display: none; }
+
+  @media (max-width: 560px) {
+    .chat-kb {
+      display: grid; place-items: center; width: 38px; height: 44px; flex: none;
+      background: color-mix(in srgb, var(--paper) 88%, transparent); color: var(--ink);
+      border: var(--bd2); cursor: pointer;
+      transition: background .15s, color .15s, transform .12s var(--ease-out);
+    }
+    .chat-kb svg { width: 17px; height: 17px; }
+    .chat-kb:active { transform: scale(.93); }
+    .chat-kb[aria-expanded="true"] { background: var(--flame); color: var(--ink-fixed); }
+    /* chips jangan kepotong di tengah kata kayak sebelumnya */
+    .chat-quick { flex-wrap: wrap; overflow: visible; }
+    .chat-chip { flex: 0 1 auto; }
+  }
+
+  /* keyboard aktif (HP atau papan ketik dalam) → prioritas ruang baca */
+  .chat-panel[data-kb="on"] .chat-quick,
+  .chat-panel[data-kb="on"] .chat-note { display: none; }
+
+  .chat-board {
+    flex: none; border-top: var(--bd2);
+    background: color-mix(in srgb, var(--paper-2) 96%, transparent);
+    animation: boardIn .18s var(--ease-out) both;
+  }
+  .chat-board[hidden] { display: none; }
+  .chat-board-pane[hidden] { display: none; }
+  @keyframes boardIn { from { opacity: 0; transform: translateY(6px); } to { opacity: 1; transform: none; } }
+
+  .chat-board-head { display: flex; align-items: center; gap: 4px; padding: 6px 6px 0; }
+  .chat-board-tab {
+    font-family: "Space Grotesk", sans-serif; font-weight: 700; font-size: 9.5px;
+    letter-spacing: .07em; text-transform: uppercase; padding: 6px 8px; min-height: 28px;
+    border: 1.5px solid color-mix(in srgb, var(--ink) 28%, transparent);
+    background: transparent; color: var(--ink-soft); cursor: pointer;
+    transition: background .15s, color .15s, border-color .15s;
+  }
+  .chat-board-tab[aria-pressed="true"] { background: var(--ink); color: var(--paper); border-color: var(--ink); }
+  .chat-board-acts { margin-left: auto; display: flex; align-items: center; gap: 4px; }
+  .chat-board-mic, .chat-board-close {
+    width: 28px; height: 28px; display: grid; place-items: center;
+    border: 1.5px solid color-mix(in srgb, var(--ink) 28%, transparent);
+    background: transparent; color: var(--ink); cursor: pointer;
+  }
+  .chat-board-mic[hidden] { display: none; }
+  .chat-board-mic svg, .chat-board-close svg { width: 12px; height: 12px; }
+  .chat-board-mic.is-live { background: var(--flame); color: var(--ink-fixed); border-color: var(--ink); animation: micPulse 1s ease-in-out infinite; }
+  .chat-board-mic.is-err { background: var(--ink); color: var(--paper); border-color: var(--ink); }
+  @keyframes micPulse { 50% { opacity: .55; } }
+
+  .chat-board-cats { display: flex; gap: 4px; padding: 6px 6px 0; overflow-x: auto; scrollbar-width: none; }
+  .chat-board-cats::-webkit-scrollbar { display: none; }
+  .chat-board-cat {
+    flex: none; font-family: "Space Grotesk", sans-serif; font-weight: 700; font-size: 9px;
+    letter-spacing: .06em; text-transform: uppercase; padding: 5px 7px; min-height: 26px;
+    border: 1.5px solid color-mix(in srgb, var(--ink) 22%, transparent);
+    background: transparent; color: var(--ink-soft); cursor: pointer;
+  }
+  .chat-board-cat[aria-pressed="true"] { background: var(--yolk); color: var(--ink-fixed); border-color: var(--ink); }
+  .chat-board-phrases {
+    display: flex; flex-wrap: wrap; gap: 4px; padding: 6px;
+    max-height: 132px; overflow-y: auto; overscroll-behavior: contain;
+  }
+  .chat-phrase {
+    flex: 1 1 calc(50% - 4px); min-width: 0; min-height: 34px; padding: 6px 8px;
+    text-align: left; font-family: "Epilogue", sans-serif; font-size: 11px; line-height: 1.25;
+    color: var(--ink); background: color-mix(in srgb, var(--paper) 90%, transparent);
+    border: 1.5px solid color-mix(in srgb, var(--ink) 26%, transparent); cursor: pointer;
+    transition: background .15s, color .15s, transform .12s var(--ease-out);
+  }
+  .chat-phrase:hover { background: var(--yolk); color: var(--ink-fixed); }
+  .chat-phrase:active { transform: scale(.97); }
+
+  .kb-keys { padding: 4px 6px 6px; display: flex; flex-direction: column; gap: 4px; }
+  .kb-row { display: flex; gap: 3px; }
+  .kb-key {
+    flex: 1 1 0; min-width: 0; height: 38px; display: grid; place-items: center;
+    background: color-mix(in srgb, var(--paper) 92%, transparent); color: var(--ink);
+    border: 1.5px solid color-mix(in srgb, var(--ink) 55%, transparent);
+    box-shadow: 0 2px 0 color-mix(in srgb, var(--ink) 55%, transparent);
+    font-family: "Space Grotesk", sans-serif; font-weight: 700; font-size: 13px; line-height: 1;
+    cursor: pointer; user-select: none; -webkit-user-select: none; -webkit-touch-callout: none;
+    touch-action: manipulation;
+    transition: background .1s, color .1s, transform .06s, box-shadow .06s;
+  }
+  .kb-key:active, .kb-key.is-down { transform: translateY(2px); box-shadow: 0 0 0 transparent; background: var(--yolk); color: var(--ink-fixed); }
+  .kb-key.is-mod { flex: 1.35; background: color-mix(in srgb, var(--paper-2) 92%, transparent); }
+  .kb-key.is-space { flex: 4.6; }
+  .kb-key.is-layer { flex: 1.5; font-size: 9.5px; letter-spacing: .05em; }
+  .kb-key.is-send { flex: 1.6; background: var(--flame); border-color: var(--ink); box-shadow: 0 2px 0 var(--ink); color: var(--ink-fixed); }
+  .kb-key.is-send:active { background: var(--flame); color: var(--ink-fixed); }
+  .kb-key.is-on { background: var(--ink); color: var(--paper); }
+  .kb-key svg { width: 15px; height: 15px; }
+
+  .chat-kb:focus-visible, .chat-board-tab:focus-visible, .chat-board-cat:focus-visible,
+  .chat-phrase:focus-visible, .kb-key:focus-visible, .chat-board-mic:focus-visible,
+  .chat-board-close:focus-visible { outline: 2.5px solid var(--ikb); outline-offset: 2px; }
+
   .star-burst-piece { position: fixed; z-index: 999; pointer-events: none; top: 50%; left: 50%; will-change: transform, opacity; display: grid; place-items: center; }
   .star-burst-piece svg { width: 100%; height: 100%; filter: drop-shadow(0 0 6px currentColor); }
 
@@ -2156,7 +2263,7 @@
                   <stop offset="100%" stop-color="#0ecb81" stop-opacity="0"/>
                 </linearGradient>
               </defs>
-              <g class="grid" id="chartGrid">
+              <g class="chart-grid" id="chartGrid">
                 <line class="grid-line" x1="0" y1="40" x2="640" y2="40"/>
                 <line class="grid-line" x1="0" y1="95" x2="640" y2="95"/>
                 <line class="grid-line" x1="0" y1="150" x2="640" y2="150"/>
@@ -3527,12 +3634,21 @@
   })();
 
   /* ================= PROGRESS / DOCK RING ================= */
+  /* scroll handler: satu tulisan per frame + skip delta < 0.1%.
+     Dulu tiap event scroll maksa layout (baca scrollHeight) lalu nulis width. */
   var progressBar = $('#progressBar'), dockRing = $('#dockRing');
-  function updateProgress() {
+  var progressQueued = 0, lastPr = -1;
+  function drawProgress() {
+    progressQueued = 0;
     var h = htmlEl.scrollHeight - innerHeight;
     var pr = Math.min(Math.max(scrollY / Math.max(h, 1), 0), 1);
-    if (progressBar) progressBar.style.width = (pr * 100) + '%';
+    if (Math.abs(pr - lastPr) < 0.001) return;
+    lastPr = pr;
+    if (progressBar) progressBar.style.width = (pr * 100).toFixed(2) + '%';
     if (dockRing) dockRing.setAttribute('stroke-dashoffset', String(138.2 * (1 - pr)));
+  }
+  function updateProgress() {
+    if (!progressQueued) progressQueued = requestAnimationFrame(drawProgress);
   }
   addEventListener('scroll', updateProgress, { passive: true });
   updateProgress();
@@ -4629,8 +4745,33 @@ try {
   });
 
   const clock = new THREE.Clock();
-  renderer.setAnimationLoop(() => {
-    if (!visible || document.hidden) return;
+
+  /* Pause render kalau canvas benar-benar ketutup panel chat (mobile: panel
+     hampir full-screen). Nggak ada piksel yang berubah karena canvas-nya
+     memang nggak kelihatan, tapi GPU/CPU nggak kerja sia-sia saat ngobrol. */
+  let covered = false;
+  function syncCovered() {
+    covered = false;
+    if (!document.body.classList.contains('chat-open')) return;
+    const panel = document.querySelector('.chat-panel');
+    if (!panel) return;
+    const c = canvas.getBoundingClientRect();
+    const p = panel.getBoundingClientRect();
+    if (c.width < 1 || c.height < 1) return;
+    covered = p.left <= c.left + 1 && p.top <= c.top + 1 && p.right >= c.right - 1 && p.bottom >= c.bottom - 1;
+  }
+  if (canvas.parentElement) {
+    new MutationObserver(function () {
+      syncCovered();
+      /* panel chat punya transisi 170ms — ukur ulang setelah settle */
+      setTimeout(syncCovered, 240);
+    }).observe(document.body, { attributes: true, attributeFilter: ['class'] });
+    window.addEventListener('resize', syncCovered, { passive: true });
+    syncCovered();
+  }
+
+  function heroFrame() {
+    if (!visible || covered || document.hidden) return;
     const dt = Math.min(clock.getDelta(), 0.05);
     const time = clock.elapsedTime;
     if (!dragging) {
@@ -4660,7 +4801,33 @@ try {
     renderer.render(scene, camera);
     fN++;
     if (tier < 2) checkFps();
-  });
+  }
+
+  /* Jangan jalankan loop hero bersamaan dengan loop loader: mulai hanya
+     setelah loader selesai dan benar-benar dilepas dari DOM. */
+  let heroStarted = false;
+  function startHero() {
+    if (heroStarted) return;
+    heroStarted = true;
+    renderer.setAnimationLoop(heroFrame);
+  }
+  (function waitForLoader() {
+    if (!document.getElementById('loader')) { startHero(); return; }
+    var fallback = 0;
+    var mo = new MutationObserver(function () {
+      if (!document.getElementById('loader')) {
+        mo.disconnect();
+        clearTimeout(fallback);
+        startHero();
+      }
+    });
+    mo.observe(document.body, { childList: true, subtree: true });
+    /* jaring pengaman kalau loader gagal dilepas karena error lain */
+    fallback = setTimeout(function () {
+      mo.disconnect();
+      startHero();
+    }, 8000);
+  })();
 } catch (err) {
   document.documentElement.classList.add('no3d');
 }
@@ -4791,8 +4958,11 @@ try {
       <button class="chat-chip" type="button" data-q="wa">Ngobrol di WA</button>
     </div>
     <form class="chat-form" id="chatForm" novalidate>
+      <button class="chat-kb" id="chatKb" type="button" aria-label="Buka papan ketik cepat" title="Papan ketik cepat" aria-expanded="false" aria-controls="chatBoard">
+        <svg viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linejoin="round" aria-hidden="true"><rect x="1.5" y="5" width="17" height="10"/><path d="M5 8.5h1M9.5 8.5h1M14 8.5h1M7 12h6"/></svg>
+      </button>
       <div class="chat-field" id="chatField">
-        <textarea class="chat-input" id="chatInput" rows="1" placeholder="Tanya apa aja…" autocomplete="off" maxlength="500" aria-label="Tulis pesan untuk Bagus AI"></textarea>
+        <textarea class="chat-input" id="chatInput" rows="1" placeholder="Tanya apa aja…" autocomplete="off" maxlength="500" enterkeyhint="send" autocapitalize="sentences" spellcheck="false" aria-label="Tulis pesan untuk Bagus AI"></textarea>
         <span class="chat-count" id="chatCount" aria-hidden="true">0/500</span>
       </div>
       <button class="chat-send" id="chatSend" type="submit" aria-label="Kirim pesan">
@@ -4800,6 +4970,27 @@ try {
         <svg class="ic-stop" viewBox="0 0 16 16" aria-hidden="true"><rect x="4.5" y="4.5" width="7" height="7" rx="1" fill="currentColor"/></svg>
       </button>
     </form>
+    <div class="chat-board" id="chatBoard" role="group" hidden aria-label="Papan ketik cepat">
+      <div class="chat-board-head">
+        <button class="chat-board-tab" id="boardTabPhrase" type="button" data-mode="phrase" aria-pressed="true">Kalimat</button>
+        <button class="chat-board-tab" id="boardTabKeys" type="button" data-mode="keys" aria-pressed="false">Ketik</button>
+        <div class="chat-board-acts">
+          <button class="chat-board-mic" id="boardMic" type="button" aria-label="Dikte suara" aria-pressed="false" hidden>
+            <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" aria-hidden="true"><rect x="6" y="1.5" width="4" height="8" rx="2"/><path d="M3.5 7.5a4.5 4.5 0 0 0 9 0M8 12v2.5"/></svg>
+          </button>
+          <button class="chat-board-close" id="boardClose" type="button" aria-label="Tutup papan ketik" title="Tutup">
+            <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m3 6 5 5 5-5"/></svg>
+          </button>
+        </div>
+      </div>
+      <div class="chat-board-pane" id="boardPhrase">
+        <div class="chat-board-cats" id="boardCats" role="group" aria-label="Kategori pertanyaan"></div>
+        <div class="chat-board-phrases" id="boardPhrases"></div>
+      </div>
+      <div class="chat-board-pane" id="boardKeys" hidden>
+        <div class="kb-keys" id="kbKeys"></div>
+      </div>
+    </div>
     <p class="chat-note" id="chatNote">Asisten AI — bisa salah. Untuk deal &amp; detail, <a href="https://wa.me/62882003160605?text=Halo%20Bagus%2C%20aku%20dari%20website!" target="_blank" rel="noopener">chat WA</a>.</p>
   </div>
 </div>
@@ -5014,6 +5205,8 @@ try {
       sendBtn.setAttribute('aria-label', on ? 'Stop jawaban' : 'Kirim pesan');
       sendBtn.disabled = !on && !(input && input.value.trim());
     }
+    var boardSend = kbKeys && kbKeys.querySelector('.kb-key.is-send');
+    if (boardSend) boardSend.disabled = on || !(input && input.value.trim());
     if (input) input.setAttribute('aria-busy', on ? 'true' : 'false');
     body.setAttribute('aria-busy', on ? 'true' : 'false');
   }
@@ -5069,6 +5262,10 @@ try {
     var list = el.querySelector('.chat-think-steps');
     var api = {
       el: el, steps: [], done: false, started: performance.now(), timer: 0,
+      setLabel: function (text) {
+        if (api.done || !text) return;
+        label.textContent = text;
+      },
       setPending: function (text) {
         if (api.steps.length) return;
         list.innerHTML = '<li class="is-pending">' + escapeHTML(text) + '</li>';
@@ -5101,7 +5298,7 @@ try {
         el.classList.remove('is-live');
         el.setAttribute('data-open', 'false');
         head.setAttribute('aria-expanded', 'false');
-        label.textContent = 'Berpikir ' + fmtSec(performance.now() - api.started);
+        label.textContent = 'Selesai · ' + fmtSec(performance.now() - api.started);
         time.textContent = api.steps.length ? api.steps.length + ' langkah' : '';
       },
       remove: function () {
@@ -5187,6 +5384,44 @@ try {
     node.appendChild(acts);
   }
 
+  /* Saran lanjutan kontekstual — cuma nempel di jawaban terakhir biar
+     percakapan nggak penuh tombol. Semua label = query yang sudah dikenal
+     `keywordKey`, jadi tetap jalan walau API mati (mode lokal). */
+  function followFor(raw) {
+    var s = String(raw || '').toLowerCase();
+    if (/demo|reel|9:16/.test(s)) return ['Harga & paket', 'Bisa bikin apa?', 'Chat WA'];
+    if (/rp\s?\d|harga|paket|\bdp\b/.test(s)) return ['Proses kerja', 'Lihat demo', 'Chat WA'];
+    if (/layanan|bisa bikin|logo|video|toko|company/.test(s)) return ['Harga & paket', 'Lihat demo', 'Chat WA'];
+    return ['Harga & paket', 'Bisa bikin apa?', 'Lihat demo'];
+  }
+
+  function addFollow(node, raw) {
+    var old = body.querySelectorAll('.chat-next');
+    for (var i = 0; i < old.length; i++) old[i].parentNode.removeChild(old[i]);
+
+    var list = followFor(raw);
+    var wrap = document.createElement('div');
+    wrap.className = 'chat-next';
+    wrap.setAttribute('aria-label', 'Pertanyaan lanjutan');
+
+    for (var k = 0; k < list.length; k++) {
+      var btn = document.createElement('button');
+      btn.type = 'button';
+      btn.className = 'chat-next-btn';
+      btn.textContent = list[k];
+      btn.addEventListener('click', function (e) {
+        var t = e.currentTarget.textContent;
+        if (streaming) return;
+        closeBoard(false);
+        if (t === 'Chat WA') { window.open(WA, '_blank', 'noopener'); return; }
+        addMsg(t, 'user');
+        aiReply(t);
+      });
+      wrap.appendChild(btn);
+    }
+    node.appendChild(wrap);
+  }
+
   function addMsg(text, who, opts) {
     opts = opts || {};
     var d = document.createElement('div');
@@ -5196,7 +5431,10 @@ try {
     else d.innerHTML = fmt(text);
     d._raw = text;
     body.appendChild(d);
-    if (who !== 'user') addActs(d, text, opts);
+    if (who !== 'user') {
+      addActs(d, text, opts);
+      if (opts.actions !== false) addFollow(d, text);
+    }
     scrollBottom(true);
     return d;
   }
@@ -5211,11 +5449,20 @@ try {
     return b;
   }
 
+  /* Streaming: token SSE bisa datang lebih cepat dari frame. Render markdown
+     maksimal tiap ~48ms — teks tetap kelihatan ngetik, tapi fmt()+innerHTML
+     nggak dijalankan puluhan kali per detik. Final state dijamin `finalize`. */
+  var lastPaintAt = 0;
   function paint(bubble, raw) {
     bubble._raw = raw;
     if (bubble._raf) return;
-    bubble._raf = requestAnimationFrame(function () {
+    bubble._raf = requestAnimationFrame(function tick() {
+      if (performance.now() - lastPaintAt < 48) {
+        bubble._raf = requestAnimationFrame(tick);
+        return;
+      }
       bubble._raf = 0;
+      lastPaintAt = performance.now();
       bubble.innerHTML = fmt(bubble._raw);
       scrollBottom();
     });
@@ -5234,6 +5481,7 @@ try {
       if (!b._raf && b.innerHTML === '' && !REDUCE) b.innerHTML = '';
       paint(b, p.answer);
       setStatus('busy', 'Menulis…');
+      if (c.think) c.think.setLabel('Menulis…');
     } else if (t) {
       setStatus('busy', 'Berpikir…');
     }
@@ -5259,6 +5507,7 @@ try {
     }
 
     addActs(b, answer, { regen: true });
+    addFollow(b, answer);
     history.push({ role: 'assistant', content: answer });
     trimHistory();
     save();
@@ -5310,6 +5559,7 @@ try {
       }
     }
     setStatus(remoteOff ? 'local' : 'online', remoteOff ? localLabel : onlineLabel);
+    if (lastBot) addFollow(lastBot.node, lastBot.node._raw || '');
   }
 
   function welcome() {
@@ -5543,6 +5793,7 @@ try {
   function sendUser(text) {
     text = String(text || '').trim();
     if (!text || streaming) return;
+    closeBoard(false);
     addMsg(text, 'user');
     if (input) {
       input.value = '';
@@ -5563,6 +5814,8 @@ try {
     if (field) field.classList.toggle('has-count', len > 380);
     if (count) count.textContent = len + '/500';
     if (sendBtn) sendBtn.disabled = !streaming && !input.value.trim();
+    var boardSend = kbKeys && kbKeys.querySelector('.kb-key.is-send');
+    if (boardSend) boardSend.disabled = streaming || !input.value.trim();
   }
 
   if (input) {
@@ -5601,9 +5854,524 @@ try {
     quick.addEventListener('click', function (e) {
       var btn = e.target.closest ? e.target.closest('.chat-chip') : null;
       if (!btn || streaming) return;
+      if (btn.getAttribute('data-q') === 'wa') { window.open(WA, '_blank', 'noopener'); return; }
+      closeBoard(false);
       var label = btn.textContent.trim();
       addMsg(label, 'user');
       aiReply(label);
+    });
+  }
+
+  /* ---------------- papan ketik cepat ---------------- */
+  /* Keyboard dalam app: nggak perlu keyboard Android naik-turun cuma buat
+     nanya pendek. Mode "Kalimat" = pertanyaan siap kirim, mode "Ketik" =
+     QWERTY ringkas. Textarea tetap input asli (aksesibel + keyboard fisik),
+     cuma dikunci `readonly` selama papan terbuka biar keyboard HP nggak ikut. */
+
+  var panel = widget.querySelector('.chat-panel');
+  var kbBtn = document.getElementById('chatKb');
+  var board = document.getElementById('chatBoard');
+  var boardPhrase = document.getElementById('boardPhrase');
+  var boardKeys = document.getElementById('boardKeys');
+  var boardCats = document.getElementById('boardCats');
+  var boardPhrases = document.getElementById('boardPhrases');
+  var tabPhrase = document.getElementById('boardTabPhrase');
+  var tabKeys = document.getElementById('boardTabKeys');
+  var boardClose = document.getElementById('boardClose');
+  var boardMic = document.getElementById('boardMic');
+  var kbKeys = document.getElementById('kbKeys');
+
+  var PHRASES = {
+    harga: [
+      'Berapa harga paketnya?',
+      'Bisa bayar DP dulu?',
+      'Paket mana yang cocok buat UMKM?',
+      'Apa aja isi tiap paket?'
+    ],
+    layanan: [
+      'Bisa bikin toko online?',
+      'Bisa desain logo?',
+      'Bisa bikin company profile?',
+      'Bisa bikin video promosi?'
+    ],
+    proses: [
+      'Berapa lama pengerjaannya?',
+      'Revisinya berapa kali?',
+      'Mulai dari mana kalau mau pesan?',
+      'Bagaimana proses kerjanya?'
+    ],
+    portfolio: [
+      'Lihat contoh website',
+      'Lihat demo video',
+      'Portfolio apa aja yang pernah dibuat?',
+      'Bisa lihat karya terbaru?'
+    ]
+  };
+  var CAT_LABEL = { harga: 'Harga', layanan: 'Layanan', proses: 'Proses', portfolio: 'Portfolio' };
+
+  var kbOpen = false;
+  var kbMode = 'phrase';
+  var kbCat = 'harga';
+  var kbLayer = 'abc';
+  var kbShift = false;
+  var kbCaps = false;
+  var kbHoldT = 0, kbHoldI = 0;
+  var kbLastShift = 0;
+  var baseH = window.innerHeight;
+  var kbTimer = 0;
+
+  var ICON_SHIFT = '<svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round" aria-hidden="true"><path d="M8 2 2.5 8H5v5h6V8h2.5z"/></svg>';
+  var ICON_BACK = '<svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linejoin="round" aria-hidden="true"><path d="M5.5 3h8v10h-8L1.5 8z"/><path d="m7.5 6 3 3M10.5 6l-3 3"/></svg>';
+
+  var KB_ROWS = {
+    abc: [
+      ['q', 'w', 'e', 'r', 't', 'y', 'u', 'i', 'o', 'p'],
+      ['a', 's', 'd', 'f', 'g', 'h', 'j', 'k', 'l'],
+      ['shift', 'z', 'x', 'c', 'v', 'b', 'n', 'm', 'back'],
+      ['layer', ',', 'space', '.', 'send']
+    ],
+    sym: [
+      ['1', '2', '3', '4', '5', '6', '7', '8', '9', '0'],
+      ['-', '/', ':', ';', '(', ')', '$', '&', '@', '"'],
+      ['#', '%', '*', '+', '=', '!', '?', ',', 'back'],
+      ['abc', 'space', '.', 'send']
+    ]
+  };
+
+  function isMobile() {
+    return !!(window.matchMedia && window.matchMedia('(max-width: 560px)').matches);
+  }
+
+  function kbVisible() {
+    if (kbOpen) return true;
+    if (!isMobile()) return false;
+    var vv = window.visualViewport;
+    var vh = vv ? vv.height : window.innerHeight;
+    return Math.min(vh, window.innerHeight) < baseH - 90;
+  }
+
+  function syncKB() {
+    if (!panel) return;
+    if (kbVisible()) panel.setAttribute('data-kb', 'on');
+    else panel.removeAttribute('data-kb');
+  }
+
+  function onViewportChange() {
+    clearTimeout(kbTimer);
+    kbTimer = setTimeout(function () {
+      if (!kbOpen && window.innerHeight > baseH + 60) baseH = window.innerHeight;
+      syncKB();
+      if (widget.classList.contains('open')) scrollBottom(true);
+    }, 90);
+  }
+
+  function focusComposer() {
+    if (!input) return;
+    try { input.focus({ preventScroll: true }); } catch (e) { input.focus(); }
+  }
+
+  function setComposer(v) {
+    if (!input) return;
+    input.value = String(v == null ? '' : v).slice(0, 500);
+    var n = input.value.length;
+    try { input.setSelectionRange(n, n); } catch (e) {}
+    autoGrow();
+  }
+
+  /* insert di posisi kursor; textarea readonly tetap bisa diubah programatis */
+  function insertAtCaret(str) {
+    if (!input) return;
+    var a = input.selectionStart, b = input.selectionEnd;
+    if (a == null) a = input.value.length;
+    if (b == null) b = a;
+    var v = input.value;
+    input.value = v.slice(0, a) + str + v.slice(b);
+    var pos = a + str.length;
+    try { input.setSelectionRange(pos, pos); } catch (e) {}
+    input.dispatchEvent(new Event('input', { bubbles: true }));
+  }
+
+  function backspaceAtCaret() {
+    if (!input) return;
+    var a = input.selectionStart, b = input.selectionEnd;
+    if (a == null) return;
+    var v = input.value;
+    if (a !== b) {
+      input.value = v.slice(0, a) + v.slice(b);
+    } else if (a > 0) {
+      var start = a - 1;
+      /* jangan potong emoji/surrogate pair di tengah */
+      if (start > 0 && /[\uDC00-\uDFFF]/.test(v.charAt(start)) && /[\uD800-\uDBFF]/.test(v.charAt(start - 1))) start--;
+      input.value = v.slice(0, start) + v.slice(a);
+      a = start;
+    } else return;
+    try { input.setSelectionRange(a, a); } catch (e) {}
+    input.dispatchEvent(new Event('input', { bubbles: true }));
+  }
+
+  function paintShift() {
+    if (!kbKeys) return;
+    var keys = kbKeys.querySelectorAll('.kb-key[data-letter]');
+    for (var i = 0; i < keys.length; i++) {
+      var k = keys[i].getAttribute('data-k');
+      keys[i].textContent = (kbShift || kbCaps) ? k.toUpperCase() : k;
+    }
+    var sh = kbKeys.querySelector('.kb-key[data-k="shift"]');
+    if (sh) {
+      sh.classList.toggle('is-on', kbShift || kbCaps);
+      sh.setAttribute('aria-pressed', (kbShift || kbCaps) ? 'true' : 'false');
+    }
+  }
+
+  function keyButton(k) {
+    var b = document.createElement('button');
+    b.type = 'button';
+    b.className = 'kb-key';
+    b.setAttribute('data-k', k);
+    if (k === 'shift') {
+      b.classList.add('is-mod');
+      b.innerHTML = ICON_SHIFT;
+      b.setAttribute('aria-label', 'Shift');
+      b.setAttribute('aria-pressed', (kbShift || kbCaps) ? 'true' : 'false');
+      if (kbShift || kbCaps) b.classList.add('is-on');
+    } else if (k === 'back') {
+      b.classList.add('is-mod');
+      b.innerHTML = ICON_BACK;
+      b.setAttribute('aria-label', 'Hapus');
+    } else if (k === 'space') {
+      b.classList.add('is-space');
+      b.textContent = 'spasi';
+      b.setAttribute('aria-label', 'Spasi');
+    } else if (k === 'send') {
+      b.classList.add('is-send');
+      b.textContent = 'Kirim';
+      b.setAttribute('aria-label', 'Kirim pesan');
+      b.disabled = streaming || !(input && input.value.trim());
+    } else if (k === 'layer') {
+      b.classList.add('is-layer');
+      b.textContent = '123';
+      b.setAttribute('aria-label', 'Angka dan simbol');
+    } else if (k === 'abc') {
+      b.classList.add('is-layer');
+      b.textContent = 'ABC';
+      b.setAttribute('aria-label', 'Huruf');
+    } else if (k === ',') {
+      b.textContent = ',';
+      b.setAttribute('aria-label', 'Koma');
+    } else if (k === '.') {
+      b.textContent = '.';
+      b.setAttribute('aria-label', 'Titik');
+    } else {
+      b.setAttribute('data-letter', '1');
+      b.textContent = (kbShift || kbCaps) ? k.toUpperCase() : k;
+      b.setAttribute('aria-label', 'Huruf ' + k);
+    }
+    return b;
+  }
+
+  function renderKeys() {
+    if (!kbKeys) return;
+    var rows = KB_ROWS[kbLayer] || KB_ROWS.abc;
+    var frag = document.createDocumentFragment();
+    for (var r = 0; r < rows.length; r++) {
+      var row = document.createElement('div');
+      row.className = 'kb-row';
+      for (var i = 0; i < rows[r].length; i++) row.appendChild(keyButton(rows[r][i]));
+      frag.appendChild(row);
+    }
+    kbKeys.innerHTML = '';
+    kbKeys.appendChild(frag);
+  }
+
+  function renderCats() {
+    if (!boardCats) return;
+    boardCats.innerHTML = '';
+    for (var k in PHRASES) {
+      if (!PHRASES.hasOwnProperty(k)) continue;
+      var b = document.createElement('button');
+      b.type = 'button';
+      b.className = 'chat-board-cat';
+      b.textContent = CAT_LABEL[k] || k;
+      b.setAttribute('aria-pressed', k === kbCat ? 'true' : 'false');
+      b.setAttribute('data-cat', k);
+      b.addEventListener('click', function (e) {
+        kbCat = e.currentTarget.getAttribute('data-cat');
+        renderCats();
+        renderPhrases();
+      });
+      boardCats.appendChild(b);
+    }
+  }
+
+  function renderPhrases() {
+    if (!boardPhrases) return;
+    boardPhrases.innerHTML = '';
+    var list = PHRASES[kbCat] || [];
+    for (var i = 0; i < list.length; i++) {
+      var b = document.createElement('button');
+      b.type = 'button';
+      b.className = 'chat-phrase';
+      b.textContent = list[i];
+      b.title = 'Kirim: ' + list[i];
+      b.addEventListener('click', function (e) {
+        sendPhrase(e.currentTarget.textContent);
+      });
+      boardPhrases.appendChild(b);
+    }
+  }
+
+  function sendPhrase(t) {
+    t = String(t || '').trim();
+    if (!t || streaming) return;
+    closeBoard(false);
+    addMsg(t, 'user');
+    aiReply(t);
+    announce('Terkirim: ' + t);
+  }
+
+  function setMode(mode) {
+    kbMode = mode === 'keys' ? 'keys' : 'phrase';
+    if (boardPhrase) boardPhrase.hidden = kbMode !== 'phrase';
+    if (boardKeys) boardKeys.hidden = kbMode !== 'keys';
+    if (tabPhrase) tabPhrase.setAttribute('aria-pressed', kbMode === 'phrase' ? 'true' : 'false');
+    if (tabKeys) tabKeys.setAttribute('aria-pressed', kbMode === 'keys' ? 'true' : 'false');
+    if (kbMode === 'keys') renderKeys();
+  }
+
+  function openBoard(mode) {
+    if (!board || !panel) return;
+    var kbWasUp = panel.getAttribute('data-kb') === 'on';
+    if (!kbOpen) {
+      kbOpen = true;
+      if (input) {
+        /* kunci dulu: readonly + inputmode none = keyboard HP nggak muncul */
+        input.blur();
+        input.setAttribute('inputmode', 'none');
+        input.setAttribute('readonly', '');
+        if (!input.value) kbShift = true;
+      }
+      board.hidden = false;
+      panel.setAttribute('data-kb', 'on');
+      if (kbBtn) {
+        kbBtn.setAttribute('aria-expanded', 'true');
+        kbBtn.setAttribute('aria-label', 'Tutup papan ketik cepat');
+      }
+    }
+    setMode(mode || kbMode);
+    /* kasih waktu keyboard HP turun dulu, baru fokus tanpa memunculkannya */
+    if (kbWasUp) setTimeout(function () { if (kbOpen) focusComposer(); }, 240);
+    else focusComposer();
+    if (input) {
+      try {
+        var n = input.value.length;
+        input.setSelectionRange(n, n);
+      } catch (e) {}
+    }
+    scrollBottom(true);
+    setTimeout(function () { if (kbOpen) scrollBottom(true); }, 200);
+    announce('Papan ketik cepat terbuka');
+  }
+
+  function closeBoard(focusNative) {
+    if (!kbOpen) {
+      if (focusNative) focusComposer();
+      return;
+    }
+    kbOpen = false;
+    stopBackHold();
+    stopMic();
+    if (board) board.hidden = true;
+    if (input) {
+      input.removeAttribute('readonly');
+      input.removeAttribute('inputmode');
+    }
+    if (panel && !kbVisible()) panel.removeAttribute('data-kb');
+    if (kbBtn) {
+      kbBtn.setAttribute('aria-expanded', 'false');
+      kbBtn.setAttribute('aria-label', 'Buka papan ketik cepat');
+    }
+    if (focusNative) focusComposer();
+    else if (input) input.blur();
+    syncKB();
+  }
+
+  function startBackHold() {
+    stopBackHold();
+    kbHoldT = setTimeout(function () {
+      kbHoldI = setInterval(function () {
+        if (!kbOpen) { stopBackHold(); return; }
+        backspaceAtCaret();
+      }, 55);
+    }, 380);
+  }
+
+  function stopBackHold() {
+    clearTimeout(kbHoldT);
+    clearInterval(kbHoldI);
+    kbHoldT = 0;
+    kbHoldI = 0;
+  }
+
+  function pressKey(k, el) {
+    if (!k || !input) return;
+    if (k === 'shift') {
+      var now = performance.now();
+      if (now - kbLastShift < 340) {
+        kbCaps = !kbCaps;
+        kbShift = kbCaps;
+      } else {
+        kbCaps = false;
+        kbShift = !kbShift;
+      }
+      kbLastShift = now;
+      paintShift();
+      return;
+    }
+    if (k === 'back') {
+      backspaceAtCaret();
+      kbShift = !kbCaps && (input.value === '' || /[.!?]\s+$/.test(input.value));
+      paintShift();
+      startBackHold();
+      return;
+    }
+    if (k === 'layer') { kbLayer = 'sym'; renderKeys(); return; }
+    if (k === 'abc') { kbLayer = 'abc'; renderKeys(); return; }
+    if (k === 'send') {
+      if (streaming || !input.value.trim()) return;
+      sendUser(input.value);
+      return;
+    }
+    if (k === 'space') {
+      insertAtCaret(' ');
+      kbShift = !kbCaps && /[.!?]\s+$/.test(input.value);
+      paintShift();
+      return;
+    }
+    insertAtCaret(k);
+    if (/^[a-z]$/.test(k) && !kbCaps) { kbShift = false; paintShift(); }
+    if (navigator.vibrate) { try { navigator.vibrate(5); } catch (e) {} }
+  }
+
+  var kbLastKeyAt = 0;
+  if (kbKeys) {
+    kbKeys.addEventListener('pointerdown', function (e) {
+      var k = e.target.closest ? e.target.closest('.kb-key') : null;
+      if (!k || k.disabled) return;
+      e.preventDefault();
+      kbLastKeyAt = performance.now();
+      k.classList.add('is-down');
+      pressKey(k.getAttribute('data-k'), k);
+    });
+    kbKeys.addEventListener('pointerup', function (e) {
+      var k = e.target.closest ? e.target.closest('.kb-key') : null;
+      if (k) k.classList.remove('is-down');
+      stopBackHold();
+    });
+    kbKeys.addEventListener('pointercancel', stopBackHold);
+    kbKeys.addEventListener('pointerleave', function (e) {
+      var k = e.target.closest ? e.target.closest('.kb-key') : null;
+      if (k && k.getAttribute('data-k') === 'back') stopBackHold();
+    });
+    document.addEventListener('pointerup', stopBackHold, true);
+    document.addEventListener('pointercancel', stopBackHold, true);
+    /* keyboard fisik / screen reader: Enter atau Spasi di tombol */
+    kbKeys.addEventListener('keydown', function (e) {
+      if (e.key !== 'Enter' && e.key !== ' ') return;
+      var k = e.target.closest ? e.target.closest('.kb-key') : null;
+      if (!k || k.disabled) return;
+      e.preventDefault();
+      kbLastKeyAt = performance.now();
+      pressKey(k.getAttribute('data-k'), k);
+    });
+    kbKeys.addEventListener('click', function (e) {
+      var k = e.target.closest ? e.target.closest('.kb-key') : null;
+      if (!k || k.disabled) return;
+      /* klik dari keyboard/AT saja; tap sudah ditangani pointerdown */
+      if (e.detail === 0 && performance.now() - kbLastKeyAt > 350) pressKey(k.getAttribute('data-k'), k);
+    });
+    kbKeys.addEventListener('contextmenu', function (e) { e.preventDefault(); });
+  }
+
+  if (kbBtn) kbBtn.addEventListener('click', function () {
+    if (kbOpen) closeBoard(false);
+    else openBoard('phrase');
+  });
+  if (tabPhrase) tabPhrase.addEventListener('click', function () { setMode('phrase'); });
+  if (tabKeys) tabKeys.addEventListener('click', function () { setMode('keys'); });
+  if (boardClose) boardClose.addEventListener('click', function () { closeBoard(false); });
+
+  /* chips kalimat: sekali ketuk langsung kirim, kolom ketik nggak diutak-atik */
+  renderCats();
+  renderPhrases();
+
+  /* dikte suara: cuma muncul kalau browser mendukung */
+  var SR = window.SpeechRecognition || window.webkitSpeechRecognition;
+  var rec = null, recOn = false;
+
+  function stopMic() {
+    if (rec && recOn) { try { rec.stop(); } catch (e) {} }
+    recOn = false;
+    if (boardMic) {
+      boardMic.classList.remove('is-live');
+      boardMic.setAttribute('aria-pressed', 'false');
+    }
+  }
+
+  if (SR && boardMic) {
+    boardMic.hidden = false;
+    boardMic.addEventListener('click', function () {
+      if (streaming) return;
+      if (recOn) { stopMic(); return; }
+      try {
+        rec = new SR();
+        rec.lang = 'id-ID';
+        rec.interimResults = true;
+        rec.continuous = false;
+        rec.maxAlternatives = 1;
+        var base = input ? input.value : '';
+        rec.onresult = function (ev) {
+          var txt = '';
+          for (var i = ev.resultIndex; i < ev.results.length; i++) txt += ev.results[i][0].transcript;
+          txt = String(txt).replace(/\s+/g, ' ').trim();
+          if (txt) setComposer((base ? base.replace(/\s+$/, '') + ' ' : '') + txt);
+        };
+        rec.onerror = function (ev) {
+          var code = ev && ev.error;
+          boardMic.classList.add('is-err');
+          setTimeout(function () { boardMic.classList.remove('is-err'); }, 1600);
+          announce(code === 'not-allowed' ? 'Izin mikrofon ditolak' : 'Dikte suara belum bisa dipakai');
+        };
+        rec.onend = function () {
+          recOn = false;
+          boardMic.classList.remove('is-live');
+          boardMic.setAttribute('aria-pressed', 'false');
+        };
+        rec.start();
+        recOn = true;
+        boardMic.classList.add('is-live');
+        boardMic.setAttribute('aria-pressed', 'true');
+        announce('Mendengarkan…');
+      } catch (e) {
+        announce('Dikte suara belum bisa dipakai');
+      }
+    });
+  }
+
+  /* tetap sinkron kalau layar berubah / keyboard HP naik-turun */
+  if (input) {
+    input.addEventListener('focus', function () {
+      if (!isMobile()) return;
+      if (!kbOpen && panel) panel.setAttribute('data-kb', 'on');
+      setTimeout(function () {
+        syncKB();
+        if (widget.classList.contains('open')) scrollBottom(true);
+      }, 520);
+    });
+    input.addEventListener('blur', function () {
+      if (!isMobile()) return;
+      setTimeout(function () {
+        if (document.activeElement !== input) syncKB();
+      }, 320);
     });
   }
 
@@ -5617,6 +6385,7 @@ try {
 
   function open() {
     lastFocus = document.activeElement;
+    baseH = window.innerHeight;
     var dockEl = document.getElementById('dock');
     var dockToggleEl = document.getElementById('dockToggle');
     if (dockEl) dockEl.classList.remove('open');
@@ -5631,22 +6400,26 @@ try {
     if (aiBtn) aiBtn.setAttribute('aria-expanded', 'true');
     markSeen();
     scrollBottom(true);
+    syncKB();
 
     if (!MOBILE) setTimeout(function () { if (input) input.focus(); }, REDUCE ? 0 : 220);
   }
 
   function close() {
+    closeBoard(false);
     var focusTarget = (lastFocus && lastFocus.offsetParent) ? lastFocus : (aiBtn || document.getElementById('dockToggle'));
     if (focusTarget && typeof focusTarget.focus === 'function') { try { focusTarget.focus(); } catch (e) {} }
     widget.classList.remove('open');
     widget.setAttribute('aria-hidden', 'true');
     document.body.classList.remove('chat-open');
+    if (panel) panel.removeAttribute('data-kb');
     if (fab) fab.setAttribute('aria-expanded', 'false');
     if (aiBtn) aiBtn.setAttribute('aria-expanded', 'false');
     setTimeout(function () { if (!widget.classList.contains('open')) widget.inert = true; }, REDUCE ? 0 : 190);
   }
 
   function newChat() {
+    closeBoard(false);
     if (current) {
       current.aborted = true;
       try { current.ctrl.abort(); } catch (e) {}
@@ -5705,7 +6478,12 @@ try {
       widget.classList.contains('open') ? close() : open();
       return;
     }
-    if (e.key === 'Escape' && widget.classList.contains('open')) close();
+    if (e.key === 'Escape' && widget.classList.contains('open')) {
+      /* Esc = stop dulu kalau lagi nulis, lalu tutup papan ketik, baru chat */
+      if (streaming) { e.preventDefault(); stop(); return; }
+      if (kbOpen) { e.preventDefault(); closeBoard(false); return; }
+      close();
+    }
   });
 
   document.addEventListener('click', function (e) {
@@ -5723,15 +6501,31 @@ try {
     setStatus(remoteOff ? 'local' : 'online', remoteOff ? localLabel : onlineLabel);
   });
 
-  /* visual viewport: di HP, tinggi panel ikut keyboard */
+  /* visual viewport: tinggi panel ikut keyboard HP + mode ringkas saat ngetik */
   if (window.visualViewport) {
     var vv = window.visualViewport;
     var syncVV = function () {
       document.documentElement.style.setProperty('--chat-vvh', vv.height + 'px');
+      onViewportChange();
     };
     syncVV();
     vv.addEventListener('resize', syncVV);
-    vv.addEventListener('scroll', syncVV);
+    vv.addEventListener('scroll', function () {
+      document.documentElement.style.setProperty('--chat-vvh', vv.height + 'px');
+    });
+  } else {
+    window.addEventListener('resize', onViewportChange);
+  }
+  window.addEventListener('resize', onViewportChange);
+  window.addEventListener('orientationchange', function () {
+    setTimeout(function () { baseH = window.innerHeight; syncKB(); }, 320);
+  });
+  /* kalau layar dibesarkan ke desktop saat papan terbuka, tutup papannya */
+  if (window.matchMedia) {
+    var mqWide = window.matchMedia('(min-width: 561px)');
+    var onWide = function (e) { if (e.matches) closeBoard(false); };
+    if (mqWide.addEventListener) mqWide.addEventListener('change', onWide);
+    else if (mqWide.addListener) mqWide.addListener(onWide);
   }
 
   window.bdvChat = {
@@ -5810,11 +6604,69 @@ try {
   var rows = 50, cols = 123;
   var i = 0, timer = 0;
 
+  /* v15 — ASCII tanpa relayout.
+     Dulu: tiap 250ms `el.textContent = frames[n]` → 6.150 glyph di-shape ulang,
+     seluruh <pre> di-relayout, dan text-shadow 36px digambar ulang.
+     Sekarang: 50 baris × 3 varian dibangun sekali (ditumpuk di sel grid yang
+     sama), lalu tiap tick cuma toggle `visibility` di baris yang berubah.
+     Hasil piksel identik karena tiap varian memakai line-box yang sama. */
+  var variants = [];        /* variants[frame][row] → span */
+  var onIdx = [];           /* baris → index varian yang sedang tampil */
+  var diffMap = [];         /* diffMap[a][b][row] → teks beda? */
+  var curFrame = 0;
+
+  (function buildRows() {
+    var parts = frames.map(function (s) { return s.split('\n'); });
+    var nf = parts.length;
+    var frag = document.createDocumentFragment();
+
+    for (var f = 0; f < nf; f++) variants.push([]);
+
+    for (var r = 0; r < rows; r++) {
+      var line = document.createElement('span');
+      line.className = 'am-line';
+      for (var v = 0; v < nf; v++) {
+        var cell = document.createElement('span');
+        cell.className = v === 0 ? 'am-v on' : 'am-v';
+        cell.textContent = parts[v][r] || '';
+        line.appendChild(cell);
+        variants[v][r] = cell;
+      }
+      onIdx[r] = 0;
+      frag.appendChild(line);
+    }
+
+    el.textContent = '';
+    el.appendChild(frag);
+
+    for (var a = 0; a < nf; a++) {
+      diffMap[a] = [];
+      for (var b = 0; b < nf; b++) {
+        var row = [];
+        for (var k = 0; k < rows; k++) {
+          row.push(variants[a][k].textContent !== variants[b][k].textContent);
+        }
+        diffMap[a][b] = row;
+      }
+    }
+  })();
+
+  function paint(n) {
+    if (n === curFrame) return;
+    for (var r = 0; r < rows; r++) {
+      var from = onIdx[r];
+      /* teks baris sama → span lama sudah benar, nggak perlu sentuh DOM */
+      if (from === n || !diffMap[from][n][r]) continue;
+      variants[from][r].classList.remove('on');
+      variants[n][r].classList.add('on');
+      onIdx[r] = n;
+    }
+    curFrame = n;
+  }
+
   var signEl = document.getElementById('amSign');
   var SIGN_ART = " ▄▄▄▄    ▄▄▄        ▄████  █    ██   ██████\n▓█████▄ ▒████▄     ██▒ ▀█▒ ██  ▓██▒▒██    ▒\n▒██▒ ▄██▒██  ▀█▄  ▒██░▄▄▄░▓██  ▒██░░ ▓██▄\n▒██░█▀  ░██▄▄▄▄██ ░▓█  ██▓▓▓█  ░██░  ▒   ██▒\n░▓█  ▀█▓ ▓█   ▓██▒░▒▓███▀▒▒▒█████▓ ▒██████▒▒\n░▒▓███▀▒ ▒▒   ▓▒█░ ░▒   ▒ ░▒▓▒ ▒ ▒ ▒ ▒▓▒ ▒ ░\n▒░▒   ░   ▒   ▒▒ ░  ░   ░ ░░▒░ ░ ░ ░ ░▒  ░ ░\n ░    ░   ░   ▒   ░ ░   ░  ░░░ ░ ░ ░  ░  ░\n ░            ░  ░      ░    ░           ░\n      ░";
   if (signEl) signEl.textContent = SIGN_ART;
-
-  function paint(n) { el.textContent = frames[n]; }
 
   function fit() {
     var fitEl = el.parentNode;
@@ -5909,12 +6761,11 @@ try {
       }
     }, { rootMargin: '250% 0px' });
     nearIO.observe(box);
+  } else {
+    /* fallback khusus browser tanpa IntersectionObserver */
+    visible = true;
+    start();
   }
-
-  /* jaring pengaman: tetap dimuat setelah halaman selesai load */
-  function kick() { setTimeout(start, 500); }
-  if (document.readyState === 'complete') kick();
-  else window.addEventListener('load', kick, { once: true });
 
   /* play cuma saat kelihatan — setelah discroll lewat, reel berhenti (hemat CPU) */
   if ('IntersectionObserver' in window) {
